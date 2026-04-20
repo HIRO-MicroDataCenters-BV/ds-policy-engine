@@ -11,11 +11,12 @@ Tag: Database
 import logging
 import re
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.db import get_session_factory
 from app.db.models import DeployHistoryRow, MetadataRow, RuleRow
 from app.models.responses import error_response, success_response
@@ -225,6 +226,10 @@ async def run_query(body: QueryRequest):
     The query must be a SELECT statement. INSERT, UPDATE, DELETE, DROP,
     ALTER, CREATE, and other write operations are rejected.
 
+    Disabled by default — enable by setting ``DS__DB_QUERY_ENABLED=true``
+    (dev/debug only). Exposing arbitrary SELECT to unauthenticated callers
+    is a data-exfiltration + DoS surface even with SELECT-only guards.
+
     Args:
         body: QueryRequest with ``sql`` (the query) and ``limit`` (max rows, default 200).
 
@@ -232,6 +237,17 @@ async def run_query(body: QueryRequest):
         JSONResponse: A success envelope with ``data.columns`` (list of column names),
         ``data.rows`` (list of row dicts), and ``data.count``.
     """
+    if not settings.db_query_enabled:
+        logger.warning("Blocked /query call — DS__DB_QUERY_ENABLED=false")
+        return error_response(
+            code="ENDPOINT_DISABLED",
+            message=(
+                "The ad-hoc SQL query endpoint is disabled in this environment. "
+                "Set DS__DB_QUERY_ENABLED=true to enable (dev/debug only)."
+            ),
+            status_code=403,
+        )
+
     sql = body.sql.strip()
 
     if not _SAFE_SQL.match(sql):

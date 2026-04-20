@@ -14,13 +14,13 @@ from app.core.dependencies import (
     get_policy_evaluation_service,
     get_rule_management_service,
 )
-
-logger = logging.getLogger("policy_engine.routes.policy")
 from app.models.policy import PolicyEvaluationRequest
 from app.models.responses import success_response
 from app.services.policy_deployer import PolicyDeployerService
 from app.services.policy_evaluation import PolicyEvaluationService
 from app.services.rule_management import RuleManagementService
+
+logger = logging.getLogger("policy_engine.routes.policy")
 
 router = APIRouter(prefix="/api/v1/policies", tags=["Policy Evaluation"])
 

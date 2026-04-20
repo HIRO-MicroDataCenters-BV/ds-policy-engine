@@ -42,7 +42,9 @@ readinessProbe:
   periodSeconds: 10
 
 ingress:
-  enabled: true
+  # Default off — opt-in per site via gitops values. Prevents an unintended
+  # Ingress on the default host when someone installs the chart raw.
+  enabled: false
   className: ""
   annotations: {}
   host: ds-policy-engine.nextgen.hiro-develop.nl
@@ -64,6 +66,13 @@ docs:
   # When false the chart sets DS__DOCS_ENABLED=false, disabling /docs, /redoc, /openapi.json.
   enabled: true
 
+dbQuery:
+  # Gate for the /api/v1/db/query arbitrary-SELECT endpoint used by the
+  # DB Explorer SQL console. Default OFF — exposing ad-hoc SQL even with
+  # SELECT-only guards is a data-exfiltration + DoS surface unless the
+  # caller is trusted. Enable only in dev/debug environments.
+  enabled: false
+
 env:
   logLevel: INFO
   nodeName: local
@@ -76,7 +85,8 @@ opa:
   enabled: true
   image:
     repository: openpolicyagent/opa
-    tag: latest
+    # Pin for reproducible deploys. Bump intentionally in a PR when upgrading.
+    tag: "1.2.0"
     pullPolicy: IfNotPresent
   port: 8181
   # Mounted as /config/opa-config.yaml if provided; otherwise OPA starts with defaults.

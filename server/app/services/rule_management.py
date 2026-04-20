@@ -168,6 +168,10 @@ class RuleManagementService:
             raise RuleNotFoundError(rule_id)
         new_state = not rule.get("enabled", True)
         result = await self._repo.update_rule(rule_id, {"enabled": new_state})
+        # Rule was there when we read it but is gone now — treat as not found
+        # rather than propagating None and crashing callers that expect a dict.
+        if result is None:
+            raise RuleNotFoundError(rule_id)
         logger.info("Toggled rule '%s' -> enabled=%s", rule_id, new_state)
         return result
 
@@ -203,7 +207,10 @@ class RuleManagementService:
         roles = sorted({r.get("role") for r in rules if r.get("role")})
         institutes = sorted({r.get("institute") for r in rules if r.get("institute")})
         perms = set()
-        # Collect unique (role, institute) pairs from enabled rules for scenario building
+        # Collect unique (role, institute) pairs across ALL rules (enabled or
+        # disabled) — the Tester dropdowns need to show disabled scenarios so
+        # users can preview what enabling the rule would do. If the UI wants
+        # only enabled scenarios later, add an explicit filter here.
         role_institute_pairs = []
         seen_pairs = set()
         for r in rules:

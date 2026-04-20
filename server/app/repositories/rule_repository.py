@@ -41,8 +41,12 @@ class RuleRepository(Protocol):
         """Delete a rule by ID. Returns True if deleted."""
         ...
 
-    async def append_deploy_history(self, entry: dict) -> None:
-        """Insert a new deploy history entry."""
+    async def append_deploy_history(self, entry: dict) -> dict:
+        """Insert a new deploy history entry and return the persisted row.
+
+        Return shape includes at minimum ``version`` and ``deployed_at`` —
+        PolicyDeployerService.deploy() reads ``result.get("version")``.
+        """
         ...
 
     async def get_deploy_history(self, limit: int = 20) -> list[dict]:

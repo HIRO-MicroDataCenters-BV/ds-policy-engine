@@ -44,4 +44,4 @@ class PolicyEvaluationResult(BaseModel):
     the role has no granted permissions (or no matching rule was found).
     """
 
-    permissions: list[str] = []
+    permissions: list[str] = Field(default_factory=list)

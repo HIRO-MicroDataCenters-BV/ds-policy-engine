@@ -12,7 +12,6 @@ def main() -> None:
     parser.add_argument(
         "app",
         help='App import string. Eg. "main:app"',
-        default="main:app",
     )
     parser.add_argument(
         "--app-dir",

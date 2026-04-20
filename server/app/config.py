@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     # When false, /docs, /redoc, /openapi.json are disabled.
     docs_enabled: bool = True
 
+    # --- DB query endpoint ---
+    # Gates /api/v1/db/query (arbitrary read-only SELECT). Off by default —
+    # even SELECT-only endpoints are a data-exfiltration + DoS surface if
+    # exposed to unauthenticated callers. Enable only in dev/debug.
+    db_query_enabled: bool = False
+
     model_config = SettingsConfigDict(
         env_prefix="DS__",
         env_file=".env",

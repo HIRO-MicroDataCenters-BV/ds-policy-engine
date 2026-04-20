@@ -23,7 +23,11 @@ class RuleCreate(BaseModel):
     role: str = Field(..., description="Target role for this rule")
     institute: str = Field(default="", description="Institute this rule applies to")
     permissions: list[str] = Field(
-        ..., min_length=1, description="Permissions granted by this rule"
+        default_factory=list,
+        description=(
+            "Permissions granted by this rule. May be empty "
+            "(the service surfaces such rules as a warning in the overview)."
+        ),
     )
     enabled: bool = Field(default=True)
 

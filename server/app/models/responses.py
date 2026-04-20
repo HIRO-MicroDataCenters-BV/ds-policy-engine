@@ -21,7 +21,7 @@ class ErrorItem(BaseModel):
 
 class ErrorBody(BaseModel):
     code: str
-    details: list[ErrorItem] = []
+    details: list[ErrorItem] = Field(default_factory=list)
 
 
 class ResponseMetadata(BaseModel):

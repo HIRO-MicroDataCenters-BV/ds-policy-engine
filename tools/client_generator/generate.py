@@ -57,7 +57,9 @@ def generate_openapi(
     if use_asyncio:
         generator_args += ["--library", "asyncio"]
 
-    subprocess.run([*docker_args, *generator_args], stdout=subprocess.PIPE, check=True)
+    # Inherit stdout/stderr so generator output streams to the caller — makes
+    # failures (missing Docker, bad spec, etc.) immediately visible.
+    subprocess.run([*docker_args, *generator_args], check=True)
 
 
 def main() -> None:
