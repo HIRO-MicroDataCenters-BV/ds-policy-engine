@@ -3,7 +3,24 @@ name: Test and build client
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      has_client: ${{ steps.check.outputs.has_client }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if [ -f client/pyproject.toml ]; then
+            echo "has_client=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_client=false" >> "$GITHUB_OUTPUT"
+            echo "client/pyproject.toml not present — skipping client job until the OpenAPI client is generated."
+          fi
+
   test_and_build_client:
+    needs: [detect]
+    if: needs.detect.outputs.has_client == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
