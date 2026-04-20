@@ -26,14 +26,20 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12"]
-    services:
-      opa:
-        image: openpolicyagent/opa:latest
-        ports:
-          - 8181:8181
-        options: --entrypoint /opa -- run --server --addr 0.0.0.0:8181
     steps:
       - uses: actions/checkout@v4
+
+      - name: Start OPA
+        run: |
+          docker run -d --name opa -p 8181:8181 openpolicyagent/opa:latest \
+            run --server --addr 0.0.0.0:8181 --log-level warn
+          # Wait for readiness (/health returns 200 when OPA is up)
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8181/health >/dev/null 2>&1; then
+              echo "OPA ready"; break
+            fi
+            sleep 1
+          done
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
