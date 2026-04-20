@@ -1,0 +1,14 @@
+apiVersion: v2
+name: ds-policy-engine
+description: Standalone policy-as-code microservice (FastAPI + OPA)
+type: application
+version: "0.0.0"
+appVersion: "0.0.0"
+keywords:
+  - policy
+  - opa
+  - authorization
+  - rbac
+  - fastapi
+maintainers:
+  - name: HIRO-MicroDataCenters

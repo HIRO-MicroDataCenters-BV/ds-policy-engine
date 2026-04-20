@@ -1,0 +1,8 @@
+# OpenAPI Generator Ignore
+# Generated files managed by hand are listed here.
+# Reference: https://openapi-generator.tech/docs/customization#ignore-file-format
+
+README.md
+pyproject.toml
+setup.cfg
+tox.ini

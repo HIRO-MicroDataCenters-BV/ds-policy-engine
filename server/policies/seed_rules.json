@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "last_deployed": "2026-04-02T15:15:41.305663+00:00",
+  "rules": [
+    {
+      "id": "rule-owner-full",
+      "name": "Catalog Owner Full Access",
+      "description": "Full permissions including cross-node decentralized search and federated learning",
+      "role": "catalog_owner",
+      "permissions": [
+        "catalog:read",
+        "catalog:create",
+        "catalog:update",
+        "catalog:delete",
+        "decentralized-search:execute",
+        "federated-learning:execute"
+      ],
+      "enabled": true,
+      "created_at": "2026-04-02T00:00:00Z",
+      "updated_at": "2026-04-02T15:15:38.921056+00:00"
+    },
+    {
+      "id": "rule-creator-local",
+      "name": "Catalog Creator Local CRUD",
+      "description": "CRUD operations on local institute catalog, no cross-node capabilities",
+      "role": "catalog_creator",
+      "permissions": [
+        "catalog:read",
+        "catalog:create",
+        "catalog:update",
+        "catalog:delete"
+      ],
+      "enabled": true,
+      "created_at": "2026-04-02T00:00:00Z",
+      "updated_at": "2026-04-02T00:00:00Z"
+    },
+    {
+      "id": "rule-consumer-read",
+      "name": "Catalog Consumer Read Only",
+      "description": "Read-only access to the local catalog",
+      "role": "catalog_consumer",
+      "permissions": [
+        "catalog:read"
+      ],
+      "enabled": true,
+      "created_at": "2026-04-02T00:00:00Z",
+      "updated_at": "2026-04-02T00:00:00Z"
+    }
+  ]
+}
