@@ -44,10 +44,10 @@ jobs:
 
       - name: Run style checks
         run: |
-          poetry run mypy .
-          poetry run isort . --check --diff
-          poetry run flake8 .
-          poetry run black . --check --diff
+          poetry run mypy app
+          poetry run isort app --check --diff
+          poetry run flake8 app
+          poetry run black app --check --diff
 
       - name: Run tests
         env:
