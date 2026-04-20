@@ -57,6 +57,7 @@ async def init_db(database_url: str) -> async_sessionmaker[AsyncSession]:
     # (deploy history now lives in its own table)
     async with async_session_factory() as session:
         from app.db.models import MetadataRow
+
         row = await session.get(MetadataRow, "deploy_history")
         if row:
             await session.delete(row)

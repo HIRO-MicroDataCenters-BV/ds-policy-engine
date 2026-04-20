@@ -45,6 +45,7 @@ logger = logging.getLogger("policy_engine")
 # Lifespan — startup/shutdown
 # ---------------------------------------------------------------------------
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize database, seed data, and deploy policies on startup."""
@@ -126,28 +127,35 @@ if _cors_origins:
 # Exception handlers — unified error responses
 # ---------------------------------------------------------------------------
 
+
 @app.exception_handler(PolicyEngineError)
 async def policy_engine_error_handler(request: Request, exc: PolicyEngineError):
     """Handle all custom policy engine exceptions."""
     details = []
     if hasattr(exc, "field") and exc.field:
-        details.append({
-            "field": exc.field,
-            "value": getattr(exc, "value", ""),
-            "reason": exc.message,
-        })
+        details.append(
+            {
+                "field": exc.field,
+                "value": getattr(exc, "value", ""),
+                "reason": exc.message,
+            }
+        )
     if hasattr(exc, "rule_id"):
-        details.append({
-            "field": "rule_id",
-            "value": exc.rule_id,
-            "reason": exc.message,
-        })
+        details.append(
+            {
+                "field": "rule_id",
+                "value": exc.rule_id,
+                "reason": exc.message,
+            }
+        )
     if hasattr(exc, "existing_rule_id") and exc.existing_rule_id:
-        details.append({
-            "field": "existing_rule_id",
-            "value": exc.existing_rule_id,
-            "reason": exc.message,
-        })
+        details.append(
+            {
+                "field": "existing_rule_id",
+                "value": exc.existing_rule_id,
+                "reason": exc.message,
+            }
+        )
 
     body = error_response(
         code=exc.code,

@@ -78,9 +78,7 @@ class SqliteRuleRepository:
         """Insert a new deploy history row with auto-incremented version."""
         async with self._sf() as session:
             # Get next version number
-            result = await session.execute(
-                select(func.max(DeployHistoryRow.version))
-            )
+            result = await session.execute(select(func.max(DeployHistoryRow.version)))
             max_version = result.scalar() or 0
             next_version = max_version + 1
 

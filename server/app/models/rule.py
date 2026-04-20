@@ -2,8 +2,9 @@
 Pydantic models for rule CRUD operations.
 """
 
-from datetime import datetime
 from typing import Literal
+
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -15,11 +16,15 @@ class RuleCreate(BaseModel):
     a request to create a rule. Each rule maps a role to a set of permissions.
     """
 
-    name: str = Field(..., min_length=1, max_length=100, description="Rule display name")
+    name: str = Field(
+        ..., min_length=1, max_length=100, description="Rule display name"
+    )
     description: str = Field(default="", max_length=500)
     role: str = Field(..., description="Target role for this rule")
     institute: str = Field(default="", description="Institute this rule applies to")
-    permissions: list[str] = Field(..., min_length=1, description="Permissions granted by this rule")
+    permissions: list[str] = Field(
+        ..., min_length=1, description="Permissions granted by this rule"
+    )
     enabled: bool = Field(default=True)
 
     model_config = {

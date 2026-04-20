@@ -17,7 +17,11 @@ from app.services.decision_matrix import DecisionMatrixService
 router = APIRouter(prefix="/api/v1", tags=["Decision Matrix"])
 
 
-@router.get("/decision-matrix", summary="Get decision matrix", description="Live decision matrix showing permissions for every role")
+@router.get(
+    "/decision-matrix",
+    summary="Get decision matrix",
+    description="Live decision matrix showing permissions for every role",
+)
 async def get_decision_matrix(
     service: DecisionMatrixService = Depends(get_decision_matrix_service),
 ):

@@ -21,8 +21,8 @@ from app.services.rego_generator import (
 )
 from app.services.rule_management import RuleManagementService
 
-
 # --- Adapter layer ---
+
 
 @lru_cache
 def get_policy_engine() -> OpaAdapter:
@@ -61,6 +61,7 @@ def get_rego_strategy() -> RegoGenerationStrategy:
 
 
 # --- Service layer ---
+
 
 def get_policy_evaluation_service() -> PolicyEvaluationService:
     """Build a PolicyEvaluationService wired to the current policy engine.
@@ -101,4 +102,6 @@ def get_decision_matrix_service() -> DecisionMatrixService:
         DecisionMatrixService: Service instance for building the role-permission
         decision matrix.
     """
-    return DecisionMatrixService(engine=get_policy_engine(), repository=get_rule_repository())
+    return DecisionMatrixService(
+        engine=get_policy_engine(), repository=get_rule_repository()
+    )

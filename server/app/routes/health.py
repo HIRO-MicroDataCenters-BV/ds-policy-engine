@@ -18,7 +18,11 @@ from app.models.responses import success_response
 router = APIRouter(tags=["Health"])
 
 
-@router.get("/health", summary="Health check", description="Service and policy engine health status")
+@router.get(
+    "/health",
+    summary="Health check",
+    description="Service and policy engine health status",
+)
 async def health_check(
     engine: OpaAdapter = Depends(get_policy_engine),
 ):
@@ -39,5 +43,9 @@ async def health_check(
             "version": settings.app_version,
             "node": settings.node_name,
         },
-        message="Service is healthy" if opa_ok else "Service degraded: policy engine unreachable",
+        message=(
+            "Service is healthy"
+            if opa_ok
+            else "Service degraded: policy engine unreachable"
+        ),
     )

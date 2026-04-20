@@ -5,9 +5,10 @@ Uses strategy pattern — swap the generation strategy to switch
 between permission-based, RBAC, or ABAC approaches within OPA.
 """
 
+from typing import Protocol
+
 import json
 import logging
-from typing import Protocol
 
 logger = logging.getLogger("policy_engine.rego_generator")
 
@@ -55,7 +56,12 @@ class PermissionBasedRegoStrategy:
         """
         enabled = [r for r in rules if r.get("enabled", True)]
         disabled = len(rules) - len(enabled)
-        logger.debug("Generating Rego: %d rules (%d enabled, %d disabled)", len(rules), len(enabled), disabled)
+        logger.debug(
+            "Generating Rego: %d rules (%d enabled, %d disabled)",
+            len(rules),
+            len(enabled),
+            disabled,
+        )
 
         lines = [
             "package ds.authz",

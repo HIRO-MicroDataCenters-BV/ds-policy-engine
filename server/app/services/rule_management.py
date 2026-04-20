@@ -13,7 +13,11 @@ import logging
 import math
 import re
 
-from app.core.exceptions import RuleConflictError, RuleNotFoundError, RuleValidationError
+from app.core.exceptions import (
+    RuleConflictError,
+    RuleNotFoundError,
+    RuleValidationError,
+)
 from app.models.rule import PaginationMeta, PaginationParams, RuleCreate, RuleUpdate
 from app.repositories.rule_repository import RuleRepository
 
@@ -70,7 +74,9 @@ class RuleManagementService:
                 value=", ".join(invalid),
             )
 
-    async def list_rules(self, params: PaginationParams) -> tuple[list[dict], PaginationMeta]:
+    async def list_rules(
+        self, params: PaginationParams
+    ) -> tuple[list[dict], PaginationMeta]:
         """List rules with pagination, filtering, and sorting."""
         all_rules = await self._repo.list_rules()
 
@@ -78,7 +84,9 @@ class RuleManagementService:
         if params.role:
             all_rules = [r for r in all_rules if r.get("role") == params.role]
         if params.enabled is not None:
-            all_rules = [r for r in all_rules if r.get("enabled", True) == params.enabled]
+            all_rules = [
+                r for r in all_rules if r.get("enabled", True) == params.enabled
+            ]
         if params.search:
             q = params.search.lower()
             all_rules = [r for r in all_rules if q in r.get("name", "").lower()]
@@ -204,7 +212,9 @@ class RuleManagementService:
             inst = r.get("institute", "")
             if role and inst and (role, inst) not in seen_pairs:
                 seen_pairs.add((role, inst))
-                role_institute_pairs.append({"role": role, "institute": inst, "name": r.get("name", "")})
+                role_institute_pairs.append(
+                    {"role": role, "institute": inst, "name": r.get("name", "")}
+                )
         return {
             "roles": roles,
             "institutes": institutes,

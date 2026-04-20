@@ -15,7 +15,11 @@ class PolicyEvaluationRequest(BaseModel):
 
     name: str = Field(..., min_length=1, description="User's full name")
     email: str = Field(..., min_length=1, description="User's email address")
-    role: str = Field(..., min_length=1, description="User's role (catalog_owner, catalog_creator, catalog_consumer)")
+    role: str = Field(
+        ...,
+        min_length=1,
+        description="User's role (catalog_owner, catalog_creator, catalog_consumer)",
+    )
     institute: str = Field(..., min_length=1, description="User's institute identifier")
 
     model_config = {

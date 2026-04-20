@@ -57,16 +57,26 @@ async def db_stats():
     """
     sf = _get_session_factory()
     async with sf() as session:
-        rules_count = (await session.execute(select(func.count(RuleRow.id)))).scalar() or 0
+        rules_count = (
+            await session.execute(select(func.count(RuleRow.id)))
+        ).scalar() or 0
         enabled_count = (
-            await session.execute(select(func.count(RuleRow.id)).where(RuleRow.enabled.is_(True)))
+            await session.execute(
+                select(func.count(RuleRow.id)).where(RuleRow.enabled.is_(True))
+            )
         ).scalar() or 0
         disabled_count = rules_count - enabled_count
-        meta_count = (await session.execute(select(func.count(MetadataRow.key)))).scalar() or 0
-        deploy_count = (await session.execute(select(func.count(DeployHistoryRow.id)))).scalar() or 0
+        meta_count = (
+            await session.execute(select(func.count(MetadataRow.key)))
+        ).scalar() or 0
+        deploy_count = (
+            await session.execute(select(func.count(DeployHistoryRow.id)))
+        ).scalar() or 0
 
         # Get distinct roles
-        roles_result = await session.execute(select(func.count(func.distinct(RuleRow.role))))
+        roles_result = await session.execute(
+            select(func.count(func.distinct(RuleRow.role)))
+        )
         roles_count = roles_result.scalar() or 0
 
     from app.config import settings
@@ -77,7 +87,11 @@ async def db_stats():
         data={
             "engine": db_type,
             "tables": {
-                "rules": {"total": rules_count, "enabled": enabled_count, "disabled": disabled_count},
+                "rules": {
+                    "total": rules_count,
+                    "enabled": enabled_count,
+                    "disabled": disabled_count,
+                },
                 "app_metadata": {"total": meta_count},
                 "deploy_history": {"total": deploy_count},
             },
@@ -120,7 +134,9 @@ async def browse_rules():
             }
             for r in rows
         ]
-    return success_response(data={"rows": data, "count": len(data)}, message="Rules table")
+    return success_response(
+        data={"rows": data, "count": len(data)}, message="Rules table"
+    )
 
 
 @router.get(
@@ -142,7 +158,9 @@ async def browse_metadata():
         result = await session.execute(select(MetadataRow).order_by(MetadataRow.key))
         rows = result.scalars().all()
         data = [{"key": r.key, "value": r.value} for r in rows]
-    return success_response(data={"rows": data, "count": len(data)}, message="Metadata table")
+    return success_response(
+        data={"rows": data, "count": len(data)}, message="Metadata table"
+    )
 
 
 @router.get(
@@ -169,7 +187,9 @@ async def browse_deploy_history():
             }
             for r in rows
         ]
-    return success_response(data={"rows": data, "count": len(data)}, message="Deploy history table")
+    return success_response(
+        data={"rows": data, "count": len(data)}, message="Deploy history table"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -188,6 +208,7 @@ _BLOCKED = re.compile(
 
 class QueryRequest(BaseModel):
     """Request body for the SQL query runner."""
+
     sql: str
     limit: int = 200
 

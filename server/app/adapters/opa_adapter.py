@@ -55,7 +55,11 @@ class OpaAdapter:
                 f"Policy engine unreachable at {self._base_url}"
             ) from exc
         except httpx.HTTPStatusError as exc:
-            logger.error("OPA evaluation failed: %s %s", exc.response.status_code, exc.response.text)
+            logger.error(
+                "OPA evaluation failed: %s %s",
+                exc.response.status_code,
+                exc.response.text,
+            )
             raise PolicyEvaluationError(
                 f"Policy evaluation returned {exc.response.status_code}"
             ) from exc
@@ -91,7 +95,9 @@ class OpaAdapter:
                     return True
                 logger.error(
                     "Failed to push '%s': %s %s",
-                    policy_id, resp.status_code, resp.text,
+                    policy_id,
+                    resp.status_code,
+                    resp.text,
                 )
                 return False
         except httpx.HTTPError as exc:

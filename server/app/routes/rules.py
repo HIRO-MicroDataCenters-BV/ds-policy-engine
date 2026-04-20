@@ -32,8 +32,12 @@ router = APIRouter(prefix="/api/v1/rules", tags=["Rules"])
 # Meta endpoints (must be registered BEFORE /{rule_id} to avoid conflicts)
 # ---------------------------------------------------------------------------
 
-@router.get("/meta", summary="All rule metadata",
-            description="Returns unique roles and permissions derived from existing rules")
+
+@router.get(
+    "/meta",
+    summary="All rule metadata",
+    description="Returns unique roles and permissions derived from existing rules",
+)
 async def get_rules_meta(
     service: RuleManagementService = Depends(get_rule_management_service),
 ):
@@ -42,8 +46,11 @@ async def get_rules_meta(
     return success_response(data=meta, message="Rule metadata retrieved")
 
 
-@router.get("/meta/roles", summary="List known roles",
-            description="Returns all unique roles currently defined across rules")
+@router.get(
+    "/meta/roles",
+    summary="List known roles",
+    description="Returns all unique roles currently defined across rules",
+)
 async def list_known_roles(
     service: RuleManagementService = Depends(get_rule_management_service),
 ):
@@ -52,21 +59,31 @@ async def list_known_roles(
     return success_response(data={"roles": roles}, message="Known roles retrieved")
 
 
-@router.get("/meta/permissions", summary="List known permissions",
-            description="Returns all unique permissions currently defined across rules")
+@router.get(
+    "/meta/permissions",
+    summary="List known permissions",
+    description="Returns all unique permissions currently defined across rules",
+)
 async def list_known_permissions(
     service: RuleManagementService = Depends(get_rule_management_service),
 ):
     """Return deduplicated, sorted list of permissions from all rules."""
     permissions = await service.get_known_permissions()
-    return success_response(data={"permissions": permissions}, message="Known permissions retrieved")
+    return success_response(
+        data={"permissions": permissions}, message="Known permissions retrieved"
+    )
 
 
 # ---------------------------------------------------------------------------
 # List & Create
 # ---------------------------------------------------------------------------
 
-@router.get("", summary="List rules", description="List all rules with pagination, filtering, and sorting")
+
+@router.get(
+    "",
+    summary="List rules",
+    description="List all rules with pagination, filtering, and sorting",
+)
 async def list_rules(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=10, ge=1, le=50),
@@ -94,19 +111,24 @@ async def list_rules(
     )
 
 
-@router.post("", summary="Create rule", description="Create a new policy rule", status_code=201)
+@router.post(
+    "", summary="Create rule", description="Create a new policy rule", status_code=201
+)
 async def create_rule(
     data: RuleCreate,
     service: RuleManagementService = Depends(get_rule_management_service),
 ):
     """Create a new rule. Roles and permissions are validated for format only."""
     rule = await service.create_rule(data)
-    return success_response(data={"rule": rule}, message="Rule created successfully", status_code=201)
+    return success_response(
+        data={"rule": rule}, message="Rule created successfully", status_code=201
+    )
 
 
 # ---------------------------------------------------------------------------
 # Single-rule operations (after meta routes to avoid /{rule_id} conflict)
 # ---------------------------------------------------------------------------
+
 
 @router.get("/{rule_id}", summary="Get rule", description="Get a single rule by ID")
 async def get_rule(
@@ -139,7 +161,9 @@ async def delete_rule(
     return success_response(message=f"Rule '{rule_id}' deleted successfully")
 
 
-@router.patch("/{rule_id}/toggle", summary="Toggle rule", description="Enable or disable a rule")
+@router.patch(
+    "/{rule_id}/toggle", summary="Toggle rule", description="Enable or disable a rule"
+)
 async def toggle_rule(
     rule_id: str,
     service: RuleManagementService = Depends(get_rule_management_service),
@@ -154,7 +178,11 @@ async def toggle_rule(
 # ---------------------------------------------------------------------------
 
 
-@router.get("/export/json", summary="Export all rules", description="Export all rules as a JSON backup file")
+@router.get(
+    "/export/json",
+    summary="Export all rules",
+    description="Export all rules as a JSON backup file",
+)
 async def export_rules(
     service: RuleManagementService = Depends(get_rule_management_service),
 ):
@@ -183,11 +211,18 @@ async def export_rules(
 
 class ImportRequest(BaseModel):
     """Request body for rule import."""
+
     rules: list[dict]
-    mode: str = "merge"  # "merge" (skip existing) or "replace" (delete all, then insert)
+    mode: str = (
+        "merge"  # "merge" (skip existing) or "replace" (delete all, then insert)
+    )
 
 
-@router.post("/import/json", summary="Import rules from JSON", description="Import rules from a previously exported JSON backup")
+@router.post(
+    "/import/json",
+    summary="Import rules from JSON",
+    description="Import rules from a previously exported JSON backup",
+)
 async def import_rules(
     body: ImportRequest,
     service: RuleManagementService = Depends(get_rule_management_service),
@@ -230,7 +265,10 @@ async def import_rules(
             # Check for existing by name (merge mode)
             if body.mode == "merge":
                 existing = await repo.list_rules()
-                if any(r.get("name", "").lower() == rule.get("name", "").lower() for r in existing):
+                if any(
+                    r.get("name", "").lower() == rule.get("name", "").lower()
+                    for r in existing
+                ):
                     skipped += 1
                     continue
 
@@ -247,7 +285,13 @@ async def import_rules(
         except Exception as exc:
             errors.append({"rule": rule.get("name", "unknown"), "error": str(exc)})
 
-    logger.info("Imported %d rules (skipped=%d, errors=%d, mode=%s)", imported, skipped, len(errors), body.mode)
+    logger.info(
+        "Imported %d rules (skipped=%d, errors=%d, mode=%s)",
+        imported,
+        skipped,
+        len(errors),
+        body.mode,
+    )
 
     return success_response(
         data={
@@ -288,25 +332,30 @@ async def export_rules_csv(
     writer.writerow(CSV_COLUMNS)
     for r in rules:
         perms = r.get("permissions", [])
-        writer.writerow([
-            r.get("name", ""),
-            r.get("description", ""),
-            r.get("role", ""),
-            r.get("institute", ""),
-            ";".join(perms) if isinstance(perms, list) else str(perms),
-            "true" if r.get("enabled", True) else "false",
-        ])
+        writer.writerow(
+            [
+                r.get("name", ""),
+                r.get("description", ""),
+                r.get("role", ""),
+                r.get("institute", ""),
+                ";".join(perms) if isinstance(perms, list) else str(perms),
+                "true" if r.get("enabled", True) else "false",
+            ]
+        )
 
     logger.info("Exported %d rules as CSV", len(rules))
     return PlainTextResponse(
         content=output.getvalue(),
         media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=policy-rules-{datetime.now().strftime('%Y-%m-%d')}.csv"},
+        headers={
+            "Content-Disposition": f"attachment; filename=policy-rules-{datetime.now().strftime('%Y-%m-%d')}.csv"
+        },
     )
 
 
 class CsvImportRequest(BaseModel):
     """Request body for CSV import."""
+
     csv_content: str
     mode: str = "merge"
 
@@ -326,7 +375,11 @@ async def import_rules_csv(
     Permissions should be semicolon-separated (e.g. catalog:read;catalog:create).
     """
     if body.mode not in ("merge", "replace"):
-        return error_response(code="INVALID_MODE", message="Mode must be 'merge' or 'replace'", status_code=400)
+        return error_response(
+            code="INVALID_MODE",
+            message="Mode must be 'merge' or 'replace'",
+            status_code=400,
+        )
 
     from app.core.dependencies import get_rule_repository
 
@@ -337,19 +390,25 @@ async def import_rules_csv(
     parsed_rules = []
     for row in reader:
         perms_raw = row.get("permissions", "")
-        perms = [p.strip() for p in perms_raw.split(";") if p.strip()] if perms_raw else []
+        perms = (
+            [p.strip() for p in perms_raw.split(";") if p.strip()] if perms_raw else []
+        )
         enabled_raw = row.get("enabled", "true").lower().strip()
-        parsed_rules.append({
-            "name": row.get("name", "").strip(),
-            "description": row.get("description", "").strip(),
-            "role": row.get("role", "").strip(),
-            "institute": row.get("institute", "").strip(),
-            "permissions": perms,
-            "enabled": enabled_raw not in ("false", "0", "no"),
-        })
+        parsed_rules.append(
+            {
+                "name": row.get("name", "").strip(),
+                "description": row.get("description", "").strip(),
+                "role": row.get("role", "").strip(),
+                "institute": row.get("institute", "").strip(),
+                "permissions": perms,
+                "enabled": enabled_raw not in ("false", "0", "no"),
+            }
+        )
 
     if not parsed_rules:
-        return error_response(code="EMPTY_CSV", message="No rules found in CSV", status_code=400)
+        return error_response(
+            code="EMPTY_CSV", message="No rules found in CSV", status_code=400
+        )
 
     imported = 0
     skipped = 0
@@ -363,11 +422,15 @@ async def import_rules_csv(
     for rule in parsed_rules:
         try:
             if not rule.get("name") or not rule.get("role"):
-                errors.append({"rule": rule.get("name", "?"), "error": "Missing name or role"})
+                errors.append(
+                    {"rule": rule.get("name", "?"), "error": "Missing name or role"}
+                )
                 continue
             if body.mode == "merge":
                 existing = await repo.list_rules()
-                if any(r.get("name", "").lower() == rule["name"].lower() for r in existing):
+                if any(
+                    r.get("name", "").lower() == rule["name"].lower() for r in existing
+                ):
                     skipped += 1
                     continue
             await repo.create_rule(rule)
@@ -375,9 +438,20 @@ async def import_rules_csv(
         except Exception as exc:
             errors.append({"rule": rule.get("name", "?"), "error": str(exc)})
 
-    logger.info("CSV import: %d imported, %d skipped, %d errors, mode=%s", imported, skipped, len(errors), body.mode)
+    logger.info(
+        "CSV import: %d imported, %d skipped, %d errors, mode=%s",
+        imported,
+        skipped,
+        len(errors),
+        body.mode,
+    )
     return success_response(
-        data={"imported": imported, "skipped": skipped, "errors": errors, "total_in_csv": len(parsed_rules)},
+        data={
+            "imported": imported,
+            "skipped": skipped,
+            "errors": errors,
+            "total_in_csv": len(parsed_rules),
+        },
         message=f"Imported {imported} rule(s), skipped {skipped}, errors {len(errors)}",
     )
 
@@ -385,6 +459,7 @@ async def import_rules_csv(
 # ---------------------------------------------------------------------------
 # Rego Export
 # ---------------------------------------------------------------------------
+
 
 @router.get(
     "/export/rego",
@@ -403,5 +478,7 @@ async def export_rego():
     return PlainTextResponse(
         content=rego,
         media_type="text/plain",
-        headers={"Content-Disposition": f"attachment; filename=policy-{datetime.now().strftime('%Y-%m-%d')}.rego"},
+        headers={
+            "Content-Disposition": f"attachment; filename=policy-{datetime.now().strftime('%Y-%m-%d')}.rego"
+        },
     )

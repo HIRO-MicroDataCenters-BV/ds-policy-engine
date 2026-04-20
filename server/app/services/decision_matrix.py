@@ -54,7 +54,11 @@ class DecisionMatrixService:
                 seen_pairs.add((role, inst))
                 role_institute_pairs.append((role, inst, r.get("name", "")))
 
-        logger.debug("Building matrix: %d role-institute pairs × %d permissions", len(role_institute_pairs), len(all_perms))
+        logger.debug(
+            "Building matrix: %d role-institute pairs × %d permissions",
+            len(role_institute_pairs),
+            len(all_perms),
+        )
 
         matrix = []
         for role, institute, rule_name in role_institute_pairs:
@@ -69,7 +73,9 @@ class DecisionMatrixService:
                 result = await self._engine.evaluate(input_data)
                 permissions = result.get("permissions", [])
             except Exception:
-                logger.warning("Matrix evaluation failed for role=%s institute=%s", role, institute)
+                logger.warning(
+                    "Matrix evaluation failed for role=%s institute=%s", role, institute
+                )
                 permissions = []
 
             entry = {"role": role, "institute": institute, "permissions": permissions}
