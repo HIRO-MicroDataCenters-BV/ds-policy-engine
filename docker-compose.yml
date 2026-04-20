@@ -43,6 +43,9 @@ services:
       DS__NODE_NAME: local
       DS__CORS_ALLOWED_ORIGINS: "http://localhost:8080,http://127.0.0.1:8080"
       DS__DOCS_ENABLED: "true"
+      # Local dev only — exposes /api/v1/db/query (arbitrary read-only SELECT)
+      # so the UI's DB Explorer tab works. Do NOT set this in gitops values.
+      DS__DB_QUERY_ENABLED: "true"
     volumes:
       - policy-data:/app/data
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
