@@ -70,7 +70,6 @@ async def init_db(database_url: str) -> async_sessionmaker[AsyncSession]:
 
 async def close_db() -> None:
     """Dispose the engine on shutdown."""
-    global engine
     if engine:
         await engine.dispose()
         logger.info("Database connection closed")
