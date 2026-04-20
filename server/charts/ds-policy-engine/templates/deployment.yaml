@@ -56,8 +56,10 @@ spec:
               value: "/code/policies"
             - name: DS__LOG_LEVEL
               value: {{ .Values.env.logLevel | quote }}
+            # Defaults to the release namespace when env.nodeName is empty,
+            # so per-site gitops values don't have to duplicate the namespace.
             - name: DS__NODE_NAME
-              value: {{ .Values.env.nodeName | quote }}
+              value: {{ .Values.env.nodeName | default (include "ds-policy-engine.namespace" .) | quote }}
             - name: DS__CORS_ALLOWED_ORIGINS
               value: {{ .Values.cors.allowedOrigins | quote }}
             - name: DS__DOCS_ENABLED

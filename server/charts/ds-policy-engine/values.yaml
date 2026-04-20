@@ -75,7 +75,10 @@ dbQuery:
 
 env:
   logLevel: INFO
-  nodeName: local
+  # Leave empty for in-cluster installs — the chart defaults DS__NODE_NAME to
+  # the release namespace (see templates/deployment.yaml). Override only if
+  # the service-level tag should differ from the namespace name.
+  nodeName: ""
 
 database:
   # sqlite+aiosqlite default persists at {{ .Values.persistence.mountPath }}/policy_engine.db
