@@ -26,6 +26,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12"]
+    services:
+      opa:
+        image: openpolicyagent/opa:latest
+        ports:
+          - 8181:8181
+        options: --entrypoint /opa -- run --server --addr 0.0.0.0:8181
     steps:
       - uses: actions/checkout@v4
 
