@@ -163,7 +163,7 @@ class TestGetRule:
         })
         fetched = await repo.get_rule(created["id"])
         expected_keys = {
-            "id", "name", "description", "role",
+            "id", "name", "description", "role", "institute",
             "permissions", "enabled", "created_at", "updated_at",
         }
         assert set(fetched.keys()) == expected_keys
