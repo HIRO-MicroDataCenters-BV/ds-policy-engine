@@ -15,8 +15,10 @@ import logging
 
 import httpx
 from fastapi import APIRouter, Request, Response
+from fastapi.responses import JSONResponse
 
 from app.config import settings
+from app.models.responses import error_response
 
 logger = logging.getLogger("policy_engine.opa_proxy")
 
