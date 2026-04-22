@@ -24,9 +24,9 @@ def sqlite_test_client(mock_engine, temp_policies_dir):
     """
     import asyncio
 
-    from app.rest_api import depends as dependencies
     from app.core.rego_generator import PermissionBasedRegoStrategy
     from app.main import app
+    from app.rest_api import depends as dependencies
 
     # Create in-memory SQLite
     loop = asyncio.new_event_loop()
