@@ -290,7 +290,7 @@ def seed_rules_file(temp_policies_dir):
 @pytest.fixture
 def test_client(mock_engine, mock_repo_with_seed, temp_policies_dir):
     """Provide a FastAPI TestClient with all service dependencies overridden to use MockPolicyEngine, seed-loaded InMemoryRuleRepository, and a temporary policies directory."""
-    from app.core import dependencies
+    from app.rest_api import depends as dependencies
     from app.core.rego_generator import PermissionBasedRegoStrategy
     from app.main import app
 

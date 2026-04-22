@@ -24,7 +24,7 @@ def sqlite_test_client(mock_engine, temp_policies_dir):
     """
     import asyncio
 
-    from app.core import dependencies
+    from app.rest_api import depends as dependencies
     from app.core.rego_generator import PermissionBasedRegoStrategy
     from app.main import app
 
