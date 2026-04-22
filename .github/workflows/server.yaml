@@ -76,9 +76,9 @@ jobs:
         # the Actions runner for reasons we haven't root-caused yet.
         run: |
           poetry run pytest \
-            --deselect tests/integration/test_health_api.py::TestHealthEndpoint::test_health_check \
-            --deselect tests/integration/test_health_api.py::TestOpaManagementEndpoint::test_list_opa_policies \
-            --deselect tests/integration/test_health_api.py::TestOpaManagementEndpoint::test_opa_health
+            --deselect app/rest_api/routes/tests/test_health_api.py::TestHealthEndpoint::test_health_check \
+            --deselect app/rest_api/routes/tests/test_health_api.py::TestOpaManagementEndpoint::test_list_opa_policies \
+            --deselect app/rest_api/routes/tests/test_health_api.py::TestOpaManagementEndpoint::test_opa_health
 
       - name: Verify OpenAPI spec has been updated
         run: |
