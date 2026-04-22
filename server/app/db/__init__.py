@@ -3,11 +3,11 @@ Database package — models, engine, and seed logic.
 
 Usage:
     from app.db import init_db, close_db, get_session_factory
-    from app.db.models import RuleRow, MetadataRow, Base
+    from app.core.repository.db_models import RuleRow, MetadataRow, Base
 """
 
+from app.core.repository.db_models import Base, MetadataRow, RuleRow
 from app.db.engine import close_db, init_db
-from app.db.models import Base, MetadataRow, RuleRow
 
 
 def get_session_factory():

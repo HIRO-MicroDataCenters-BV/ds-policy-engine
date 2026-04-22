@@ -19,8 +19,8 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.core.exceptions import PolicyEngineError
 from app.db import close_db, init_db
-from app.models.responses import error_response
-from app.routes import (
+from app.rest_api.response import error_response
+from app.rest_api.routes import (
     db_viewer,
     decision_matrix,
     health,
@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
         logger.info("Seeded %d rules into database", seeded)
 
     # --- Wait for OPA to be ready ---
-    from app.core.dependencies import get_policy_deployer_service, get_policy_engine
+    from app.rest_api.depends import get_policy_deployer_usecase, get_policy_engine
 
     engine = get_policy_engine()
     for attempt in range(30):
@@ -79,7 +79,7 @@ async def lifespan(app: FastAPI):
         return
 
     # Deploy seed policies
-    deployer = get_policy_deployer_service()
+    deployer = get_policy_deployer_usecase()
     await deployer.startup_deploy()
     logger.info("Policy Engine ready")
 

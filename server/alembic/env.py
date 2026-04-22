@@ -13,7 +13,7 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.db.models import Base
+from app.core.repository.db_models import Base
 
 # Alembic Config object
 config = context.config

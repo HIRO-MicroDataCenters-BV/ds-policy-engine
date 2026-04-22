@@ -10,7 +10,7 @@ import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.db.models import Base
+from app.core.repository.db_models import Base
 
 logger = logging.getLogger("policy_engine.database")
 
@@ -56,7 +56,7 @@ async def init_db(database_url: str) -> async_sessionmaker[AsyncSession]:
     # One-time cleanup: remove legacy deploy_history from app_metadata
     # (deploy history now lives in its own table)
     async with async_session_factory() as session:
-        from app.db.models import MetadataRow
+        from app.core.repository.db_models import MetadataRow
 
         row = await session.get(MetadataRow, "deploy_history")
         if row:

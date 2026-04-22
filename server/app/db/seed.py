@@ -14,7 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import settings
-from app.db.models import MetadataRow, RuleRow
+from app.core.repository.db_models import MetadataRow, RuleRow
 
 logger = logging.getLogger("policy_engine.seed")
 
