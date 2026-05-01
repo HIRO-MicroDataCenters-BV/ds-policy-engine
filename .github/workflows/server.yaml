@@ -31,11 +31,14 @@ jobs:
 
       - name: Start OPA
         run: |
-          docker run -d --name opa -p 8181:8181 openpolicyagent/opa:latest \
-            run --server --addr 0.0.0.0:8181 --log-level warn
-          # Wait for readiness (/health returns 200 when OPA is up)
+          # --network host shares the runner's network namespace, so OPA
+          # listens on the runner's loopback directly. No port mapping
+          # needed; pytest reaches it via http://127.0.0.1:8181.
+          docker run -d --name opa --network host openpolicyagent/opa:latest \
+            run --server --addr 127.0.0.1:8181 --log-level warn
+          # Wait for readiness (/health returns 200 when OPA is up).
           for i in {1..30}; do
-            if curl -fsS http://localhost:8181/health >/dev/null 2>&1; then
+            if curl -fsS http://127.0.0.1:8181/health >/dev/null 2>&1; then
               echo "OPA ready"; break
             fi
             sleep 1
@@ -64,18 +67,12 @@ jobs:
       - name: Run tests
         env:
           DS__DATABASE_URL: sqlite+aiosqlite:///./test.db
-          DS__OPA_BASE_URL: http://localhost:8181
+          # 127.0.0.1 explicitly — httpx prefers ::1 for "localhost" in some
+          # environments while OPA binds only to IPv4, which previously broke
+          # the three reachability integration tests.
+          DS__OPA_BASE_URL: http://127.0.0.1:8181
           DS__LOG_LEVEL: WARNING
-        # TODO: re-enable the three OPA-reachability integration tests below
-        # once the CI sidecar is reliably reachable from pytest's process.
-        # They pass locally via `docker compose up` + pytest. Deselected here
-        # because the localhost:8181 -> container mapping has been flaky in
-        # the Actions runner for reasons we haven't root-caused yet.
-        run: |
-          poetry run pytest \
-            --deselect app/rest_api/routes/tests/test_health_api.py::TestHealthEndpoint::test_health_check \
-            --deselect app/rest_api/routes/tests/test_health_api.py::TestOpaManagementEndpoint::test_list_opa_policies \
-            --deselect app/rest_api/routes/tests/test_health_api.py::TestOpaManagementEndpoint::test_opa_health
+        run: poetry run pytest
 
       - name: Verify OpenAPI spec has been updated
         run: |
