@@ -1,0 +1,80 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Tests & coverage ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Secrets / local env ---
+.env
+.env.local
+server/.env
+
+# --- Data / local DB ---
+server/data/
+server/uploads/
+*.db
+*.db-wal
+*.db-shm
+
+# --- Helm ---
+.helm/
+server/charts/**/*.tgz
+
+# --- CI scratch files produced by tools/version.sh ---
+VERSION_APP
+VERSION_CHART
+VERSION_DOCKER
+DOCKER_IMAGES
+
+# --- Release outputs ---
+.dist/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Node (UI contamination guard) ---
+node_modules/
+
+# --- Poetry local venv (if created in-project) ---
+server/.venv/
+
+# --- Local docker/compose overrides ---
+docker-compose.override.yml

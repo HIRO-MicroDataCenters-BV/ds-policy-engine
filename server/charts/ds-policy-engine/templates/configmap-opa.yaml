@@ -1,0 +1,12 @@
+{{- if and .Values.opa.enabled .Values.opa.configYaml -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ds-policy-engine.fullname" . }}-opa
+  namespace: {{ include "ds-policy-engine.namespace" . }}
+  labels:
+    {{- include "ds-policy-engine.labels" . | nindent 4 }}
+data:
+  opa-config.yaml: |
+{{ .Values.opa.configYaml | indent 4 }}
+{{- end }}

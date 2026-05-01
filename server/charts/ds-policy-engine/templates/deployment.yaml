@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ds-policy-engine.fullname" . }}
+  namespace: {{ include "ds-policy-engine.namespace" . }}
+  labels:
+    {{- include "ds-policy-engine.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ds-policy-engine.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ds-policy-engine.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "ds-policy-engine.serviceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: policy-engine
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            {{- toYaml .Values.container.command | nindent 12 }}
+          args:
+            {{- toYaml .Values.container.args | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.container.port }}
+              protocol: TCP
+          env:
+            - name: DS__OPA_BASE_URL
+              value: "http://127.0.0.1:{{ .Values.opa.port }}"
+            - name: DS__DATABASE_URL
+              value: {{ .Values.database.url | quote }}
+            - name: DS__POLICIES_DIR
+              value: "/code/policies"
+            - name: DS__LOG_LEVEL
+              value: {{ .Values.env.logLevel | quote }}
+            # Defaults to the release namespace when env.nodeName is empty,
+            # so per-site gitops values don't have to duplicate the namespace.
+            - name: DS__NODE_NAME
+              value: {{ .Values.env.nodeName | default (include "ds-policy-engine.namespace" .) | quote }}
+            - name: DS__CORS_ALLOWED_ORIGINS
+              value: {{ .Values.cors.allowedOrigins | quote }}
+            - name: DS__DOCS_ENABLED
+              value: {{ .Values.docs.enabled | quote }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.persistence.mountPath }}
+          {{- end }}
+
+        {{- if .Values.opa.enabled }}
+        - name: opa
+          image: "{{ .Values.opa.image.repository }}:{{ .Values.opa.image.tag }}"
+          imagePullPolicy: {{ .Values.opa.image.pullPolicy }}
+          args:
+            - "run"
+            - "--server"
+            - "--addr"
+            - "0.0.0.0:{{ .Values.opa.port }}"
+            - "--log-level"
+            - "info"
+            - "--log-format"
+            - "json"
+            {{- if .Values.opa.configYaml }}
+            - "--config-file"
+            - "/config/opa-config.yaml"
+            {{- end }}
+          ports:
+            - name: opa
+              containerPort: {{ .Values.opa.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.opa.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.opa.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.opa.resources | nindent 12 }}
+          {{- if .Values.opa.configYaml }}
+          volumeMounts:
+            - name: opa-config
+              mountPath: /config
+          {{- end }}
+        {{- end }}
+
+      {{- if or .Values.persistence.enabled (and .Values.opa.enabled .Values.opa.configYaml) }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "ds-policy-engine.fullname" . }}-data
+        {{- end }}
+        {{- if and .Values.opa.enabled .Values.opa.configYaml }}
+        - name: opa-config
+          configMap:
+            name: {{ include "ds-policy-engine.fullname" . }}-opa
+        {{- end }}
+      {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

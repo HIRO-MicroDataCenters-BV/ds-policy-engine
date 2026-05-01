@@ -1,0 +1,859 @@
+openapi: 3.1.0
+info:
+  title: Data Space Policy Engine Service
+  description: Standalone policy-as-code microservice. Evaluates user permissions
+    based on role and institute using OPA.
+  contact:
+    name: HIRO-MicroDataCenters
+    email: all-hiro@hiro-microdatacenters.nl
+  license:
+    name: MIT
+    url: https://github.com/HIRO-MicroDataCenters-BV/ds-policy-engine/blob/main/LICENSE
+  version: 0.1.0
+paths:
+  /api/v1/policies/evaluate:
+    post:
+      tags:
+      - Policy Evaluation
+      summary: Evaluate policy
+      description: Evaluate user permissions based on role and institute
+      operationId: evaluate_policy_api_v1_policies_evaluate_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyEvaluationRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/policies/deploy:
+    post:
+      tags:
+      - Policy Evaluation
+      summary: Deploy policies to Policy Agent
+      description: Generate Rego and push to the policy agent
+      operationId: deploy_policies_api_v1_policies_deploy_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/DeployRequest'
+              - type: 'null'
+              title: Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/policies/preview:
+    post:
+      tags:
+      - Policy Evaluation
+      summary: Preview generated Rego
+      description: Preview Rego from saved rules, or pass custom rules in the body
+        for live preview
+      operationId: preview_rego_api_v1_policies_preview_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - $ref: '#/components/schemas/PreviewRequest'
+              - type: 'null'
+              title: Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/policies/deploy-history:
+    get:
+      tags:
+      - Policy Evaluation
+      summary: Deploy history
+      description: Returns the recent deploy history log
+      operationId: deploy_history_api_v1_policies_deploy_history_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/policies/overview:
+    get:
+      tags:
+      - Policy Evaluation
+      summary: Policy manager overview
+      description: Stats, conflicts, and deploy info for the manager dashboard
+      operationId: policy_overview_api_v1_policies_overview_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rules/meta:
+    get:
+      tags:
+      - Rules
+      summary: All rule metadata
+      description: Returns unique roles and permissions derived from existing rules
+      operationId: get_rules_meta_api_v1_rules_meta_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rules/meta/roles:
+    get:
+      tags:
+      - Rules
+      summary: List known roles
+      description: Returns all unique roles currently defined across rules
+      operationId: list_known_roles_api_v1_rules_meta_roles_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rules/meta/permissions:
+    get:
+      tags:
+      - Rules
+      summary: List known permissions
+      description: Returns all unique permissions currently defined across rules
+      operationId: list_known_permissions_api_v1_rules_meta_permissions_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rules:
+    get:
+      tags:
+      - Rules
+      summary: List rules
+      description: List all rules with pagination, filtering, and sorting
+      operationId: list_rules_api_v1_rules_get
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 50
+          minimum: 1
+          default: 10
+          title: Page Size
+      - name: sort_by
+        in: query
+        required: false
+        schema:
+          type: string
+          default: created_at
+          title: Sort By
+      - name: sort_order
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+          title: Sort Order
+      - name: role
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+      - name: enabled
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Enabled
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Rules
+      summary: Create rule
+      description: Create a new policy rule
+      operationId: create_rule_api_v1_rules_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/rules/{rule_id}:
+    get:
+      tags:
+      - Rules
+      summary: Get rule
+      description: Get a single rule by ID
+      operationId: get_rule_api_v1_rules__rule_id__get
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Rule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Rules
+      summary: Update rule
+      description: Update an existing rule
+      operationId: update_rule_api_v1_rules__rule_id__put
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Rule Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Rules
+      summary: Delete rule
+      description: Delete a rule by ID
+      operationId: delete_rule_api_v1_rules__rule_id__delete
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Rule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/rules/{rule_id}/toggle:
+    patch:
+      tags:
+      - Rules
+      summary: Toggle rule
+      description: Enable or disable a rule
+      operationId: toggle_rule_api_v1_rules__rule_id__toggle_patch
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Rule Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/rules/export/json:
+    get:
+      tags:
+      - Rules
+      summary: Export all rules
+      description: Export all rules as a JSON backup file
+      operationId: export_rules_api_v1_rules_export_json_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/rules/import/json:
+    post:
+      tags:
+      - Rules
+      summary: Import rules from JSON
+      description: Import rules from a previously exported JSON backup
+      operationId: import_rules_api_v1_rules_import_json_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/rules/export/csv:
+    get:
+      tags:
+      - Rules
+      summary: Export rules as CSV
+      description: Export all rules as a CSV file for bulk editing in spreadsheets
+      operationId: export_rules_csv_api_v1_rules_export_csv_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/v1/rules/import/csv:
+    post:
+      tags:
+      - Rules
+      summary: Import rules from CSV
+      description: Import rules from CSV content. Permissions should be semicolon-separated.
+      operationId: import_rules_csv_api_v1_rules_import_csv_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CsvImportRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/rules/export/rego:
+    get:
+      tags:
+      - Rules
+      summary: Export generated Rego policy
+      description: Export the generated Rego source code for audit, Git versioning,
+        or compliance
+      operationId: export_rego_api_v1_rules_export_rego_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/v1/decision-matrix:
+    get:
+      tags:
+      - Decision Matrix
+      summary: Get decision matrix
+      description: Live decision matrix showing permissions for every role
+      operationId: get_decision_matrix_api_v1_decision_matrix_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/opa/policies:
+    get:
+      tags:
+      - OPA Management
+      summary: List OPA policies
+      description: List all policies currently loaded in OPA
+      operationId: list_opa_policies_api_v1_opa_policies_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/opa/policies/{policy_id}:
+    delete:
+      tags:
+      - OPA Management
+      summary: Delete OPA policy
+      description: Remove a policy from OPA
+      operationId: delete_opa_policy_api_v1_opa_policies__policy_id__delete
+      parameters:
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Policy Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/opa/health:
+    get:
+      tags:
+      - OPA Management
+      summary: OPA health
+      description: Check if OPA is reachable
+      operationId: opa_health_api_v1_opa_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/db/stats:
+    get:
+      tags:
+      - Database
+      summary: Database statistics
+      description: 'Return high-level stats: table counts, DB engine info.'
+      operationId: db_stats_api_v1_db_stats_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/db/tables/rules:
+    get:
+      tags:
+      - Database
+      summary: Browse rules table
+      description: Return all rows from the rules table with full column data.
+      operationId: browse_rules_api_v1_db_tables_rules_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/db/tables/metadata:
+    get:
+      tags:
+      - Database
+      summary: Browse metadata table
+      description: Return all key-value pairs from the app_metadata table.
+      operationId: browse_metadata_api_v1_db_tables_metadata_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/db/tables/deploy_history:
+    get:
+      tags:
+      - Database
+      summary: Browse deploy history table
+      description: Return all rows from the deploy_history table.
+      operationId: browse_deploy_history_api_v1_db_tables_deploy_history_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/db/query:
+    post:
+      tags:
+      - Database
+      summary: Run read-only SQL query
+      description: Execute a read-only SELECT query against the database. Only SELECT
+        statements are allowed; DML/DDL is rejected.
+      operationId: run_query_api_v1_db_query_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Health check
+      description: Service and policy engine health status
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    CsvImportRequest:
+      properties:
+        csv_content:
+          type: string
+          title: Csv Content
+        mode:
+          type: string
+          title: Mode
+          default: merge
+      type: object
+      required:
+      - csv_content
+      title: CsvImportRequest
+      description: Request body for CSV import.
+    DeployRequest:
+      properties:
+        deployed_by:
+          type: string
+          title: Deployed By
+          default: system
+      type: object
+      title: DeployRequest
+      description: "Optional body for deploy \u2014 includes deployer name."
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ImportRequest:
+      properties:
+        rules:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rules
+        mode:
+          type: string
+          title: Mode
+          default: merge
+      type: object
+      required:
+      - rules
+      title: ImportRequest
+      description: Request body for rule import.
+    PolicyEvaluationRequest:
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Name
+          description: User's full name
+        email:
+          type: string
+          minLength: 1
+          title: Email
+          description: User's email address
+        role:
+          type: string
+          minLength: 1
+          title: Role
+          description: User's role (catalog_owner, catalog_creator, catalog_consumer)
+        institute:
+          type: string
+          minLength: 1
+          title: Institute
+          description: User's institute identifier
+      type: object
+      required:
+      - name
+      - email
+      - role
+      - institute
+      title: PolicyEvaluationRequest
+      description: 'Request body for evaluating a user''s permissions against the
+        deployed policy.
+
+
+        The fields identify the user whose permissions should be resolved by
+
+        the policy engine. The ``role`` field is the primary input used by the
+
+        Rego policy to determine the granted permission set.'
+      examples:
+      - email: user@example.nl
+        institute: local
+        name: John Doe
+        role: catalog_owner
+    PreviewRequest:
+      properties:
+        rules:
+          anyOf:
+          - items:
+              additionalProperties: true
+              type: object
+            type: array
+          - type: 'null'
+          title: Rules
+      type: object
+      title: PreviewRequest
+      description: "Optional body for the preview endpoint.\n\nWhen ``rules`` is provided\
+        \ the Rego is generated from those rules\ninstead of the saved manifest \u2014\
+        \ useful for live-previewing unsaved\nedits in the Policy Builder."
+    QueryRequest:
+      properties:
+        sql:
+          type: string
+          title: Sql
+        limit:
+          type: integer
+          title: Limit
+          default: 200
+      type: object
+      required:
+      - sql
+      title: QueryRequest
+      description: Request body for the SQL query runner.
+    RuleCreate:
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Name
+          description: Rule display name
+        description:
+          type: string
+          maxLength: 500
+          title: Description
+          default: ''
+        role:
+          type: string
+          title: Role
+          description: Target role for this rule
+        institute:
+          type: string
+          title: Institute
+          description: Institute this rule applies to
+          default: ''
+        permissions:
+          items:
+            type: string
+          type: array
+          title: Permissions
+          description: Permissions granted by this rule. May be empty (the service
+            surfaces such rules as a warning in the overview).
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+      type: object
+      required:
+      - name
+      - role
+      title: RuleCreate
+      description: 'Schema for creating a new authorization rule.
+
+
+        Defines the required and optional fields accepted when a client submits
+
+        a request to create a rule. Each rule maps a role to a set of permissions.'
+      examples:
+      - description: Full permissions including cross-node capabilities
+        enabled: true
+        institute: local
+        name: Catalog Owner Full Access
+        permissions:
+        - catalog:read
+        - catalog:create
+        - catalog:update
+        - catalog:delete
+        - decentralized-search:execute
+        - federated-learning:execute
+        role: catalog_owner
+    RuleUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Description
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+        institute:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Institute
+        permissions:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Permissions
+        enabled:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Enabled
+      type: object
+      title: RuleUpdate
+      description: 'Schema for partially updating an existing rule.
+
+
+        All fields are optional; only the supplied fields are modified. Omitted
+
+        fields retain their current values.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
