@@ -8,6 +8,8 @@ backup and restore of the full rule set.
 Tag: Rules
 """
 
+from typing import Literal, cast
+
 import csv
 import io
 import logging
@@ -94,11 +96,14 @@ async def list_rules(
     service: RuleManagementUsecase = Depends(get_rule_management_usecase),
 ):
     """List rules with pagination, filtering, sorting, and search."""
+    # FastAPI's Query() receives sort_by/sort_order as plain strings; the
+    # downstream Pydantic model validates them against the Literal alias and
+    # raises 422 on bad values. Cast here is a typing-only narrow.
     params = PaginationParams(
         page=page,
         page_size=page_size,
-        sort_by=sort_by,
-        sort_order=sort_order,
+        sort_by=cast(Literal["created_at", "updated_at", "name", "role"], sort_by),
+        sort_order=cast(Literal["asc", "desc"], sort_order),
         role=role,
         enabled=enabled,
         search=search,
@@ -432,9 +437,8 @@ async def import_rules_csv(
                 continue
             if body.mode == "merge":
                 existing = await repo.list_rules()
-                if any(
-                    r.get("name", "").lower() == rule["name"].lower() for r in existing
-                ):
+                rule_name = str(rule["name"]).lower()
+                if any(str(r.get("name", "")).lower() == rule_name for r in existing):
                     skipped += 1
                     continue
             await repo.create_rule(rule)

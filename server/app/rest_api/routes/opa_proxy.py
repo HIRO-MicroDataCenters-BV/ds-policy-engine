@@ -70,10 +70,10 @@ async def opa_proxy(path: str, request: Request):
             )
     except httpx.HTTPError as exc:
         logger.error("OPA proxy error: %s", exc)
-        body = error_response(
+        error_body = error_response(
             code="OPA_UNREACHABLE",
             message="OPA engine unreachable",
             status_code=502,
             details=[{"field": "general", "reason": str(exc)}],
         )
-        return JSONResponse(status_code=502, content=body)
+        return JSONResponse(status_code=502, content=error_body)

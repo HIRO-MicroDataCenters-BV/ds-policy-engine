@@ -4,6 +4,8 @@ Policy evaluation and deployment routes.
 Tag: Policy Evaluation
 """
 
+from typing import Any
+
 import logging
 
 from fastapi import APIRouter, Depends
@@ -136,7 +138,7 @@ async def policy_overview(
 
     # Detect conflicts: same role+institute with different permission sets
     conflicts = []
-    pair_map = {}
+    pair_map: dict[tuple[str, str], dict[str, Any]] = {}
     for r in all_rules:
         if not r.get("enabled", True):
             continue

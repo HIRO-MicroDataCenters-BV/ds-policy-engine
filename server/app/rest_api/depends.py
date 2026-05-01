@@ -45,7 +45,13 @@ def get_rule_repository() -> SqliteRuleRepository:
     """
     from app.database import get_session_factory
 
-    return SqliteRuleRepository(get_session_factory())
+    factory = get_session_factory()
+    if factory is None:
+        raise RuntimeError(
+            "Database not initialised. Call init_db() before resolving "
+            "the rule repository dependency."
+        )
+    return SqliteRuleRepository(factory)
 
 
 @lru_cache

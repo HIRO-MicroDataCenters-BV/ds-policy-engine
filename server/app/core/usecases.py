@@ -206,7 +206,10 @@ class RuleManagementUsecase(IRuleManagementUsecase):
 
     async def get_known_roles(self) -> list[str]:
         rules = await self._repo.list_rules()
-        return sorted({r.get("role") for r in rules if r.get("role")})
+        roles: set[str] = {
+            r["role"] for r in rules if isinstance(r.get("role"), str) and r["role"]
+        }
+        return sorted(roles)
 
     async def get_known_permissions(self) -> list[str]:
         rules = await self._repo.list_rules()
@@ -217,8 +220,16 @@ class RuleManagementUsecase(IRuleManagementUsecase):
 
     async def get_meta(self) -> dict:
         rules = await self._repo.list_rules()
-        roles = sorted({r.get("role") for r in rules if r.get("role")})
-        institutes = sorted({r.get("institute") for r in rules if r.get("institute")})
+        role_set: set[str] = {
+            r["role"] for r in rules if isinstance(r.get("role"), str) and r["role"]
+        }
+        institute_set: set[str] = {
+            r["institute"]
+            for r in rules
+            if isinstance(r.get("institute"), str) and r["institute"]
+        }
+        roles = sorted(role_set)
+        institutes = sorted(institute_set)
         perms: set[str] = set()
         # Collect unique (role, institute) pairs across ALL rules (enabled or
         # disabled) — the Tester dropdowns need to show disabled scenarios so
@@ -346,7 +357,10 @@ class DecisionMatrixUsecase(IDecisionMatrixUsecase):
 
     async def build_matrix(self) -> dict:
         rules = await self._repo.list_rules()
-        roles = sorted({r.get("role") for r in rules if r.get("role")})
+        role_set: set[str] = {
+            r["role"] for r in rules if isinstance(r.get("role"), str) and r["role"]
+        }
+        roles = sorted(role_set)
         all_perms: set[str] = set()
         for r in rules:
             all_perms.update(r.get("permissions", []))

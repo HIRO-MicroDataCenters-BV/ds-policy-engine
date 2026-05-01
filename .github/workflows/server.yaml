@@ -56,9 +56,7 @@ jobs:
 
       - name: Run style checks
         run: |
-          # TODO: re-enable mypy once app/ is fully typed (Literal mismatches,
-          # union[] attribute access in routes/usecases).
-          # poetry run mypy app
+          poetry run mypy app
           poetry run isort app --check --diff
           poetry run flake8 app --config .flake8 --statistics
           poetry run black app --check --diff

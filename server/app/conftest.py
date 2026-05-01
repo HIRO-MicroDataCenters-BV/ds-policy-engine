@@ -7,6 +7,8 @@ Provides:
   - FastAPI test client
 """
 
+from typing import Any, cast
+
 import json
 import tempfile
 from datetime import datetime, timezone
@@ -77,11 +79,19 @@ class InMemoryRuleRepository:
     """In-memory rule storage for testing (no file I/O)."""
 
     def __init__(self, initial_rules: list[dict] | None = None):
-        self._manifest = {
+        # ``_manifest`` mirrors the on-disk JSON shape (mixed value types:
+        # version/int, last_deployed/str|None, rules/list[dict]) so the
+        # value type is intentionally ``Any`` and rule access goes through
+        # ``_rules()`` for narrowing.
+        self._manifest: dict[str, Any] = {
             "version": 1,
             "last_deployed": None,
             "rules": list(initial_rules) if initial_rules else [],
         }
+
+    def _rules(self) -> list[dict]:
+        """Return the typed rules list from the manifest, creating it if absent."""
+        return cast(list[dict], self._manifest.setdefault("rules", []))
 
     async def get_manifest(self) -> dict:
         """Return a shallow copy of the current manifest."""
@@ -93,13 +103,11 @@ class InMemoryRuleRepository:
 
     async def list_rules(self) -> list[dict]:
         """Return a copy of all rules in the manifest."""
-        return list(self._manifest.get("rules", []))
+        return list(self._rules())
 
     async def get_rule(self, rule_id: str) -> dict | None:
         """Return a single rule by ID, or None if not found."""
-        return next(
-            (r for r in self._manifest.get("rules", []) if r["id"] == rule_id), None
-        )
+        return next((r for r in self._rules() if r["id"] == rule_id), None)
 
     async def create_rule(self, rule: dict) -> dict:
         """Add a new rule with auto-generated ID and timestamps."""
@@ -108,12 +116,12 @@ class InMemoryRuleRepository:
         rule["created_at"] = now
         rule["updated_at"] = now
         rule.setdefault("enabled", True)
-        self._manifest.setdefault("rules", []).append(rule)
+        self._rules().append(rule)
         return rule
 
     async def update_rule(self, rule_id: str, updates: dict) -> dict | None:
         """Apply updates to an existing rule; return None if not found."""
-        rules = self._manifest.get("rules", [])
+        rules = self._rules()
         for i, r in enumerate(rules):
             if r["id"] == rule_id:
                 updated = {**r, **{k: v for k, v in updates.items() if v is not None}}
@@ -125,7 +133,7 @@ class InMemoryRuleRepository:
 
     async def delete_rule(self, rule_id: str) -> bool:
         """Remove a rule by ID; return True if it was removed."""
-        rules = self._manifest.get("rules", [])
+        rules = self._rules()
         before = len(rules)
         self._manifest["rules"] = [r for r in rules if r["id"] != rule_id]
         return len(self._manifest["rules"]) < before

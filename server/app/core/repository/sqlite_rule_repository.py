@@ -47,7 +47,7 @@ class SqliteRuleRepository:
             rules = await self._query_all_rules(session)
 
             return {
-                "version": int(meta.get("version", "1")),
+                "version": int(meta.get("version") or "1"),
                 "last_deployed": meta.get("last_deployed"),
                 "rules": rules,
             }
