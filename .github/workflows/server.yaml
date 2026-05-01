@@ -56,12 +56,11 @@ jobs:
 
       - name: Run style checks
         run: |
-          # TODO: re-enable mypy + full flake8 once app/ is fully typed and
-          # legacy lint issues are cleaned up (line lengths, unused imports,
-          # Literal mismatches, union[] attribute access, etc).
+          # TODO: re-enable mypy once app/ is fully typed (Literal mismatches,
+          # union[] attribute access in routes/usecases).
           # poetry run mypy app
           poetry run isort app --check --diff
-          poetry run flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
+          poetry run flake8 app --config .flake8 --statistics
           poetry run black app --check --diff
 
       - name: Run tests

@@ -68,7 +68,7 @@ async def deploy_policies(
     body: DeployRequest | None = None,
     service: PolicyDeployerUsecase = Depends(get_policy_deployer_usecase),
 ):
-    """Full deploy: generate Rego from saved rules, push to Policy Agent, update manifest."""
+    """Generate Rego from saved rules, push to Policy Agent, update manifest."""
     deployed_by = body.deployed_by if body else "system"
     result = await service.deploy(deployed_by=deployed_by)
     return success_response(data=result, message="Policies deployed successfully")
@@ -77,7 +77,10 @@ async def deploy_policies(
 @router.post(
     "/preview",
     summary="Preview generated Rego",
-    description="Preview Rego from saved rules, or pass custom rules in the body for live preview",
+    description=(
+        "Preview Rego from saved rules, or pass custom rules in the body "
+        "for live preview"
+    ),
 )
 async def preview_rego(
     body: PreviewRequest | None = None,
@@ -120,7 +123,6 @@ async def policy_overview(
 ):
     """Build an overview with stats, conflicts, and deploy info."""
     meta = await rule_svc.get_meta()
-    rules = meta.get("rule_scenarios", [])
     all_roles = meta.get("roles", [])
     all_perms = meta.get("permissions", [])
     all_institutes = meta.get("institutes", [])
@@ -149,7 +151,11 @@ async def policy_overview(
                         "institute": key[1],
                         "rule_a": pair_map[key]["name"],
                         "rule_b": r.get("name", ""),
-                        "message": f"Rules '{pair_map[key]['name']}' and '{r.get('name', '')}' have the same role+institute but different permissions",
+                        "message": (
+                            f"Rules '{pair_map[key]['name']}' and "
+                            f"'{r.get('name', '')}' have the same "
+                            "role+institute but different permissions"
+                        ),
                     }
                 )
         else:
@@ -167,7 +173,10 @@ async def policy_overview(
             {
                 "type": "disabled_rules",
                 "count": disabled_count,
-                "message": f"{disabled_count} rule(s) disabled and won't be enforced: {', '.join(disabled_names)}",
+                "message": (
+                    f"{disabled_count} rule(s) disabled and won't be "
+                    f"enforced: {', '.join(disabled_names)}"
+                ),
             }
         )
     # Roles with no permissions
@@ -177,7 +186,9 @@ async def policy_overview(
                 {
                     "type": "empty_permissions",
                     "rule": r.get("name", ""),
-                    "message": f"Rule '{r.get('name', '')}' has no permissions assigned",
+                    "message": (
+                        f"Rule '{r.get('name', '')}' has no " "permissions assigned"
+                    ),
                 }
             )
 

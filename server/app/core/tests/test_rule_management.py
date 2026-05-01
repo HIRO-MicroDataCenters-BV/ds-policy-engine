@@ -27,7 +27,10 @@ def empty_service(mock_repo):
 
 
 class TestListRules:
-    """Tests for rule listing with pagination, role filtering, enabled filtering, and text search."""
+    """Tests for rule listing.
+
+    Covers pagination, role filtering, enabled filtering, and text search.
+    """
 
     @pytest.mark.asyncio
     async def test_list_all_rules(self, service):
@@ -39,7 +42,7 @@ class TestListRules:
 
     @pytest.mark.asyncio
     async def test_pagination_page_size(self, service):
-        """Verify that page_size limits the returned rules and pagination metadata is correct."""
+        """Verify page_size limits returned rules and pagination is correct."""
         params = PaginationParams(page=1, page_size=2)
         rules, pagination = await service.list_rules(params)
         assert len(rules) == 2
@@ -97,7 +100,10 @@ class TestListRules:
 
 
 class TestGetRule:
-    """Tests for fetching a single rule by ID, including error handling for missing rules."""
+    """Tests for fetching a single rule by ID.
+
+    Covers error handling for missing rules.
+    """
 
     @pytest.mark.asyncio
     async def test_get_existing_rule(self, service):
@@ -108,7 +114,7 @@ class TestGetRule:
 
     @pytest.mark.asyncio
     async def test_get_nonexistent_rule_raises(self, service):
-        """Verify that fetching a non-existent rule raises RuleNotFoundError with 404."""
+        """Verify fetching a missing rule raises RuleNotFoundError with 404."""
         with pytest.raises(RuleNotFoundError) as exc_info:
             await service.get_rule("rule-nonexistent")
         assert exc_info.value.rule_id == "rule-nonexistent"
@@ -116,7 +122,11 @@ class TestGetRule:
 
 
 class TestCreateRule:
-    """Tests for rule creation including validation of role format, permission format, duplicate names, and default values."""
+    """Tests for rule creation.
+
+    Covers validation of role format, permission format, duplicate
+    names, and default values.
+    """
 
     @pytest.mark.asyncio
     async def test_create_valid_rule(self, empty_service):
@@ -162,7 +172,7 @@ class TestCreateRule:
 
     @pytest.mark.asyncio
     async def test_create_rule_custom_permission_succeeds(self, empty_service):
-        """Custom permissions (not in seed enums) should be accepted if format is valid."""
+        """Custom permissions (not in seed enums) accepted if format is valid."""
         data = RuleCreate(
             name="Custom Perm Rule",
             role="catalog_owner",
@@ -173,7 +183,7 @@ class TestCreateRule:
 
     @pytest.mark.asyncio
     async def test_create_duplicate_name_raises(self, service):
-        """Verify that creating a rule with a duplicate name raises RuleConflictError."""
+        """Verify creating a rule with a duplicate name raises an error."""
         data = RuleCreate(
             name="Catalog Owner Full Access",
             role="catalog_owner",
@@ -194,7 +204,10 @@ class TestCreateRule:
 
 
 class TestUpdateRule:
-    """Tests for partial rule updates including name, permissions, and validation of invalid inputs."""
+    """Tests for partial rule updates.
+
+    Covers name, permissions, and validation of invalid inputs.
+    """
 
     @pytest.mark.asyncio
     async def test_update_name(self, service):
@@ -234,7 +247,10 @@ class TestUpdateRule:
 
 
 class TestDeleteRule:
-    """Tests for rule deletion including removal verification and error handling for missing rules."""
+    """Tests for rule deletion.
+
+    Covers removal verification and error handling for missing rules.
+    """
 
     @pytest.mark.asyncio
     async def test_delete_existing_rule(self, service):
@@ -251,7 +267,10 @@ class TestDeleteRule:
 
 
 class TestToggleRule:
-    """Tests for toggling the enabled state of a rule, including double-toggle and missing rule errors."""
+    """Tests for toggling the enabled state of a rule.
+
+    Covers double-toggle and missing rule errors.
+    """
 
     @pytest.mark.asyncio
     async def test_toggle_disables_enabled_rule(self, service):

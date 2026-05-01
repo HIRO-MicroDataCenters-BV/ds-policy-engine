@@ -71,7 +71,7 @@ def sqlite_test_client(mock_engine, temp_policies_dir):
 
 
 async def _create_test_db():
-    """Create an in-memory SQLite async engine and initialize all ORM tables from Base metadata."""
+    """Create in-memory SQLite engine and initialize ORM tables from Base."""
     engine = create_async_engine(
         "sqlite+aiosqlite://",
         connect_args={"check_same_thread": False},
@@ -82,7 +82,10 @@ async def _create_test_db():
 
 
 async def _seed_test_rules(repo: SqliteRuleRepository):
-    """Insert three test rules (owner, creator, consumer) directly into the SQLite repository for integration testing."""
+    """Insert three test rules into the SQLite repository for integration tests.
+
+    Inserts owner, creator, and consumer rules.
+    """
     rules = [
         {
             "name": "Catalog Owner Full Access",
@@ -117,7 +120,10 @@ async def _seed_test_rules(repo: SqliteRuleRepository):
 
 
 class TestRulesCRUDWithSQLite:
-    """Tests for full CRUD operations through HTTP with a real SQLite backend, verifying persistence and conflict handling."""
+    """Tests for full CRUD operations through HTTP with a real SQLite backend.
+
+    Verifies persistence and conflict handling.
+    """
 
     def test_list_rules(self, sqlite_test_client):
         """Verify that listing rules via SQLite backend returns all 3 seeded rules."""
@@ -182,7 +188,7 @@ class TestRulesCRUDWithSQLite:
         assert resp.json()["data"]["rule"]["enabled"] is False
 
     def test_create_duplicate_returns_409(self, sqlite_test_client):
-        """Verify that creating a rule with a duplicate name returns 409 via SQLite."""
+        """Verify creating a rule with duplicate name returns 409 via SQLite."""
         resp = sqlite_test_client.post(
             "/api/v1/rules",
             json={
@@ -195,7 +201,7 @@ class TestRulesCRUDWithSQLite:
 
 
 class TestDeployWithSQLite:
-    """Tests for deploy and preview endpoints reading rules from a real SQLite database."""
+    """Tests for deploy and preview endpoints with a real SQLite database."""
 
     def test_deploy_reads_from_sqlite(self, sqlite_test_client):
         """Verify that deploy generates Rego from rules stored in SQLite."""
@@ -215,7 +221,12 @@ class TestDeployWithSQLite:
 
 
 class TestPersistenceAcrossRequests:
-    """Tests that data created, updated, or deleted via one HTTP request is correctly reflected in subsequent requests against the SQLite backend."""
+    """Tests that mutations from one HTTP request are visible in later requests.
+
+    Verifies that data created, updated, or deleted via one HTTP request
+    is correctly reflected in subsequent requests against the SQLite
+    backend.
+    """
 
     def test_create_then_list_includes_new_rule(self, sqlite_test_client):
         """Verify that a newly created rule appears in subsequent list requests."""

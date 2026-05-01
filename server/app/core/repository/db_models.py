@@ -17,8 +17,6 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 class Base(DeclarativeBase):
     """SQLAlchemy declarative base for all models."""
 
-    pass
-
 
 class RuleRow(Base):
     """Policy rule stored in the database."""

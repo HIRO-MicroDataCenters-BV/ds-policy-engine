@@ -150,7 +150,10 @@ def mock_repo():
 
 @pytest.fixture
 def mock_repo_with_seed():
-    """Provide an InMemoryRuleRepository pre-loaded with three seed rules: catalog_owner, catalog_creator, and catalog_consumer."""
+    """Provide an InMemoryRuleRepository pre-loaded with three seed rules.
+
+    Rules are for: catalog_owner, catalog_creator, and catalog_consumer.
+    """
     return InMemoryRuleRepository(
         [
             {
@@ -201,7 +204,10 @@ def mock_repo_with_seed():
 
 @pytest.fixture
 def temp_policies_dir():
-    """Provide a temporary directory that is automatically cleaned up, used for writing Rego files and seed JSON during tests."""
+    """Provide a temporary directory that is automatically cleaned up.
+
+    Used for writing Rego files and seed JSON during tests.
+    """
     with tempfile.TemporaryDirectory() as d:
         yield d
 
@@ -231,7 +237,11 @@ async def db_session_factory():
 
 @pytest.fixture
 def seed_rules_file(temp_policies_dir):
-    """Write a seed_rules.json file containing three rules (owner, creator, consumer) into temp_policies_dir and return its absolute path."""
+    """Write a seed_rules.json file with three rules and return its path.
+
+    The file contains owner, creator, and consumer rules and is written
+    into ``temp_policies_dir``.
+    """
     seed_data = {
         "version": 1,
         "last_deployed": "2026-04-02T00:00:00Z",
@@ -289,7 +299,11 @@ def seed_rules_file(temp_policies_dir):
 
 @pytest.fixture
 def test_client(mock_engine, mock_repo_with_seed, temp_policies_dir):
-    """Provide a FastAPI TestClient with all service dependencies overridden to use MockPolicyEngine, seed-loaded InMemoryRuleRepository, and a temporary policies directory."""
+    """Provide a FastAPI TestClient with all service dependencies overridden.
+
+    Overrides use MockPolicyEngine, a seed-loaded InMemoryRuleRepository,
+    and a temporary policies directory.
+    """
     from app.core.rego_generator import PermissionBasedRegoStrategy
     from app.main import app
     from app.rest_api import depends as dependencies

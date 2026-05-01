@@ -7,10 +7,14 @@ through the full HTTP request/response cycle.
 
 
 class TestListRulesEndpoint:
-    """Tests for GET /api/v1/rules including pagination, role filtering, text search, and response envelope structure."""
+    """Tests for GET /api/v1/rules.
+
+    Covers pagination, role filtering, text search, and response
+    envelope structure.
+    """
 
     def test_list_rules_default(self, test_client):
-        """Verify that listing rules without params returns all 3 rules with pagination."""
+        """Verify listing without params returns all 3 rules with pagination."""
         resp = test_client.get("/api/v1/rules")
         assert resp.status_code == 200
         body = resp.json()
@@ -80,10 +84,14 @@ class TestListRulesEndpoint:
 
 
 class TestCreateRuleEndpoint:
-    """Tests for POST /api/v1/rules including successful creation, validation errors (400), conflicts (409), and missing fields (422)."""
+    """Tests for POST /api/v1/rules.
+
+    Covers successful creation, validation errors (400), conflicts
+    (409), and missing fields (422).
+    """
 
     def test_create_rule_success(self, test_client):
-        """Verify that creating a valid rule returns 201 with generated ID and timestamps."""
+        """Verify creating a valid rule returns 201 with ID and timestamps."""
         resp = test_client.post(
             "/api/v1/rules",
             json={
@@ -171,10 +179,13 @@ class TestCreateRuleEndpoint:
 
 
 class TestGetRuleEndpoint:
-    """Tests for GET /api/v1/rules/{rule_id} including successful fetch and 404 for missing rules."""
+    """Tests for GET /api/v1/rules/{rule_id}.
+
+    Covers successful fetch and 404 for missing rules.
+    """
 
     def test_get_existing_rule(self, test_client):
-        """Verify that fetching an existing rule by ID returns 200 with correct data."""
+        """Verify fetching an existing rule by ID returns 200 with data."""
         resp = test_client.get("/api/v1/rules/rule-owner-full")
         assert resp.status_code == 200
         body = resp.json()
@@ -191,7 +202,10 @@ class TestGetRuleEndpoint:
 
 
 class TestUpdateRuleEndpoint:
-    """Tests for PUT /api/v1/rules/{rule_id} including successful updates and 404 for missing rules."""
+    """Tests for PUT /api/v1/rules/{rule_id}.
+
+    Covers successful updates and 404 for missing rules.
+    """
 
     def test_update_rule_name(self, test_client):
         """Verify that updating a rule's name via PUT returns the renamed rule."""
@@ -208,10 +222,14 @@ class TestUpdateRuleEndpoint:
 
 
 class TestDeleteRuleEndpoint:
-    """Tests for DELETE /api/v1/rules/{rule_id} including successful deletion with verification and 404 for missing rules."""
+    """Tests for DELETE /api/v1/rules/{rule_id}.
+
+    Covers successful deletion with verification and 404 for missing
+    rules.
+    """
 
     def test_delete_rule(self, test_client):
-        """Verify that deleting a rule returns 200 and the rule is no longer fetchable."""
+        """Verify deleting a rule returns 200 and the rule is unfetchable."""
         resp = test_client.delete("/api/v1/rules/rule-consumer-read")
         assert resp.status_code == 200
         assert resp.json()["status"] == "success"
@@ -226,7 +244,10 @@ class TestDeleteRuleEndpoint:
 
 
 class TestToggleRuleEndpoint:
-    """Tests for PATCH /api/v1/rules/{rule_id}/toggle including toggling enabled state and 404 for missing rules."""
+    """Tests for PATCH /api/v1/rules/{rule_id}/toggle.
+
+    Covers toggling enabled state and 404 for missing rules.
+    """
 
     def test_toggle_disables_rule(self, test_client):
         """Verify that toggling an enabled rule sets enabled to False."""

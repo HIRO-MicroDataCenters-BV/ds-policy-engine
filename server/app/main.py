@@ -113,7 +113,7 @@ app = FastAPI(
     },
     license_info={
         "name": "MIT",
-        "url": "https://github.com/HIRO-MicroDataCenters-BV/ds-policy-engine/blob/main/LICENSE",
+        "url": "https://github.com/HIRO-MicroDataCenters-BV/ds-policy-engine/blob/main/LICENSE",  # noqa: E501
     },
     lifespan=lifespan,
     **_docs_kwargs,

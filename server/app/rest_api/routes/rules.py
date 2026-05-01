@@ -10,7 +10,6 @@ Tag: Rules
 
 import csv
 import io
-import json
 import logging
 from datetime import datetime, timezone
 
@@ -348,7 +347,10 @@ async def export_rules_csv(
         content=output.getvalue(),
         media_type="text/csv",
         headers={
-            "Content-Disposition": f"attachment; filename=policy-rules-{datetime.now().strftime('%Y-%m-%d')}.csv"
+            "Content-Disposition": (
+                "attachment; filename=policy-rules-"
+                f"{datetime.now().strftime('%Y-%m-%d')}.csv"
+            )
         },
     )
 
@@ -363,7 +365,9 @@ class CsvImportRequest(BaseModel):
 @router.post(
     "/import/csv",
     summary="Import rules from CSV",
-    description="Import rules from CSV content. Permissions should be semicolon-separated.",
+    description=(
+        "Import rules from CSV content. " "Permissions should be semicolon-separated."
+    ),
 )
 async def import_rules_csv(
     body: CsvImportRequest,
@@ -464,7 +468,10 @@ async def import_rules_csv(
 @router.get(
     "/export/rego",
     summary="Export generated Rego policy",
-    description="Export the generated Rego source code for audit, Git versioning, or compliance",
+    description=(
+        "Export the generated Rego source code for audit, "
+        "Git versioning, or compliance"
+    ),
     response_class=PlainTextResponse,
 )
 async def export_rego():
@@ -479,6 +486,9 @@ async def export_rego():
         content=rego,
         media_type="text/plain",
         headers={
-            "Content-Disposition": f"attachment; filename=policy-{datetime.now().strftime('%Y-%m-%d')}.rego"
+            "Content-Disposition": (
+                "attachment; filename=policy-"
+                f"{datetime.now().strftime('%Y-%m-%d')}.rego"
+            )
         },
     )

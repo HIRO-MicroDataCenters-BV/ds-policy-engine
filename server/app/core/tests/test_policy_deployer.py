@@ -106,7 +106,7 @@ class TestStartupDeploy:
 
     @pytest.mark.asyncio
     async def test_startup_deploy_empty_rules(self, mock_engine, mock_repo):
-        """Verify that startup_deploy with no rules succeeds without pushing policies."""
+        """Verify startup_deploy with no rules succeeds without pushing."""
         svc = PolicyDeployerUsecase(
             engine=mock_engine,
             repository=mock_repo,

@@ -14,7 +14,6 @@ import re
 from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import func, select, text
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.repository.db_models import DeployHistoryRow, MetadataRow, RuleRow
 from app.database import get_session_factory
@@ -202,7 +201,8 @@ _SAFE_SQL = re.compile(r"^\s*SELECT\b", re.IGNORECASE)
 
 # Dangerous keywords that must never appear even inside a SELECT
 _BLOCKED = re.compile(
-    r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|ATTACH|DETACH|PRAGMA\s+(?!table_info|database_list))\b",
+    r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|ATTACH|DETACH"
+    r"|PRAGMA\s+(?!table_info|database_list))\b",
     re.IGNORECASE,
 )
 
@@ -231,11 +231,12 @@ async def run_query(body: QueryRequest):
     is a data-exfiltration + DoS surface even with SELECT-only guards.
 
     Args:
-        body: QueryRequest with ``sql`` (the query) and ``limit`` (max rows, default 200).
+        body: QueryRequest with ``sql`` (the query) and ``limit``
+            (max rows, default 200).
 
     Returns:
-        JSONResponse: A success envelope with ``data.columns`` (list of column names),
-        ``data.rows`` (list of row dicts), and ``data.count``.
+        JSONResponse: A success envelope with ``data.columns`` (list of
+        column names), ``data.rows`` (list of row dicts), and ``data.count``.
     """
     if not settings.db_query_enabled:
         logger.warning("Blocked /query call — DS__DB_QUERY_ENABLED=false")
@@ -262,7 +263,10 @@ async def run_query(body: QueryRequest):
         logger.warning("Blocked query with dangerous keywords")
         return error_response(
             code="BLOCKED_QUERY",
-            message="Query contains blocked keywords (INSERT, UPDATE, DELETE, DROP, etc.)",
+            message=(
+                "Query contains blocked keywords "
+                "(INSERT, UPDATE, DELETE, DROP, etc.)"
+            ),
             status_code=400,
         )
 

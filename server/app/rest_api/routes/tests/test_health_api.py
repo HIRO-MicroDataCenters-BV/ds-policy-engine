@@ -4,7 +4,11 @@ Integration tests for Health and OPA Management APIs.
 
 
 class TestHealthEndpoint:
-    """Tests for GET /health endpoint including status fields, engine connectivity, and response envelope structure."""
+    """Tests for GET /health endpoint.
+
+    Covers status fields, engine connectivity, and response envelope
+    structure.
+    """
 
     def test_health_check(self, test_client):
         """Verify that GET /health returns 200 with service and engine OK."""
@@ -31,7 +35,10 @@ class TestHealthEndpoint:
 
 
 class TestDecisionMatrixEndpoint:
-    """Tests for GET /api/v1/decision-matrix endpoint including role coverage, permission flags, and response structure."""
+    """Tests for GET /api/v1/decision-matrix endpoint.
+
+    Covers role coverage, permission flags, and response structure.
+    """
 
     def test_decision_matrix(self, test_client):
         """Verify that the decision matrix returns entries for all 3 roles."""
@@ -75,7 +82,10 @@ class TestDecisionMatrixEndpoint:
 
 
 class TestOpaManagementEndpoint:
-    """Tests for OPA management endpoints including policy listing and OPA health status."""
+    """Tests for OPA management endpoints.
+
+    Covers policy listing and OPA health status.
+    """
 
     def test_list_opa_policies(self, test_client):
         """Verify that listing OPA policies returns 200 with a policies key."""

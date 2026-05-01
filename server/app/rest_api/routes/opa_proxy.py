@@ -29,8 +29,11 @@ router = APIRouter(prefix="/opa", tags=["OPA Proxy"])
     "/{path:path}",
     methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
     summary="OPA reverse proxy",
-    description="Forwards any request to the OPA server. "
-    "Use /opa/v1/data/... for evaluation, /opa/v1/policies for management, /opa/health for health.",
+    description=(
+        "Forwards any request to the OPA server. "
+        "Use /opa/v1/data/... for evaluation, /opa/v1/policies for "
+        "management, /opa/health for health."
+    ),
     # Excluded from the OpenAPI schema — a single multi-method handler
     # generates duplicate operationIds that the openapi-generator-cli
     # rejects in strict mode. The proxy is a debug surface, not meant

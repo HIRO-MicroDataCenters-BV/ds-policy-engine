@@ -7,10 +7,14 @@ including response envelope structure, status codes, and error handling.
 
 
 class TestEvaluateEndpoint:
-    """Tests for POST /api/v1/policies/evaluate including role-based permissions, validation errors, and response envelope structure."""
+    """Tests for POST /api/v1/policies/evaluate.
+
+    Covers role-based permissions, validation errors, and response
+    envelope structure.
+    """
 
     def test_evaluate_catalog_owner(self, test_client):
-        """Verify that evaluating catalog_owner returns all 6 permissions with correct envelope."""
+        """Verify catalog_owner returns all 6 permissions with the envelope."""
         resp = test_client.post(
             "/api/v1/policies/evaluate",
             json={
@@ -50,7 +54,7 @@ class TestEvaluateEndpoint:
         assert body["data"]["permissions"] == ["catalog:read"]
 
     def test_evaluate_catalog_creator(self, test_client):
-        """Verify that evaluating catalog_creator returns CRUD but not search/FL permissions."""
+        """Verify catalog_creator returns CRUD but not search/FL permissions."""
         resp = test_client.post(
             "/api/v1/policies/evaluate",
             json={
@@ -95,7 +99,7 @@ class TestEvaluateEndpoint:
         assert resp.status_code == 422
 
     def test_evaluate_response_envelope_structure(self, test_client):
-        """Verify that the evaluate response has all required envelope and metadata keys."""
+        """Verify evaluate response has all required envelope/metadata keys."""
         resp = test_client.post(
             "/api/v1/policies/evaluate",
             json={
@@ -119,7 +123,10 @@ class TestEvaluateEndpoint:
 
 
 class TestDeployEndpoint:
-    """Tests for POST /api/v1/policies/deploy including Rego generation, deployment timestamp, and rules count."""
+    """Tests for POST /api/v1/policies/deploy.
+
+    Covers Rego generation, deployment timestamp, and rules count.
+    """
 
     def test_deploy_success(self, test_client):
         """Verify that deploying policies returns 200 with Rego and deployed_at."""
@@ -139,7 +146,10 @@ class TestDeployEndpoint:
 
 
 class TestPreviewEndpoint:
-    """Tests for POST /api/v1/policies/preview which generates Rego without deploying to the engine."""
+    """Tests for POST /api/v1/policies/preview.
+
+    Generates Rego without deploying to the engine.
+    """
 
     def test_preview_returns_rego(self, test_client):
         """Verify that preview returns generated Rego without deploying."""

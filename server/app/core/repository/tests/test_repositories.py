@@ -43,7 +43,11 @@ async def seeded_repo(repo):
 
 
 class TestCreateRule:
-    """Tests for inserting rules into SQLite, including auto-generated IDs, timestamps, default values, and multiple inserts."""
+    """Tests for inserting rules into SQLite.
+
+    Covers auto-generated IDs, timestamps, default values, and
+    multiple inserts.
+    """
 
     @pytest.mark.asyncio
     async def test_create_rule_returns_dict(self, repo):
@@ -153,7 +157,10 @@ class TestCreateRule:
 
 
 class TestGetRule:
-    """Tests for fetching a single rule by ID, including field completeness and missing rule handling."""
+    """Tests for fetching a single rule by ID.
+
+    Covers field completeness and missing rule handling.
+    """
 
     @pytest.mark.asyncio
     async def test_get_existing_rule(self, repo):
@@ -203,7 +210,10 @@ class TestGetRule:
 
 
 class TestListRules:
-    """Tests for listing all rules from SQLite, including empty DB, data types, and permissions deserialization."""
+    """Tests for listing all rules from SQLite.
+
+    Covers empty DB, data types, and permissions deserialization.
+    """
 
     @pytest.mark.asyncio
     async def test_list_empty_db(self, repo):
@@ -235,11 +245,14 @@ class TestListRules:
 
 
 class TestUpdateRule:
-    """Tests for updating existing rules including partial updates, timestamp behavior, and ID immutability."""
+    """Tests for updating existing rules.
+
+    Covers partial updates, timestamp behavior, and ID immutability.
+    """
 
     @pytest.mark.asyncio
     async def test_update_name(self, repo):
-        """Verify that updating a rule's name changes it while preserving other fields."""
+        """Verify updating a rule's name preserves other fields."""
         created = await repo.create_rule(
             {
                 "name": "Original",
@@ -327,7 +340,10 @@ class TestUpdateRule:
 
 
 class TestDeleteRule:
-    """Tests for deleting rules from SQLite, including verification of removal and count reduction."""
+    """Tests for deleting rules from SQLite.
+
+    Covers verification of removal and count reduction.
+    """
 
     @pytest.mark.asyncio
     async def test_delete_existing_rule(self, repo):
@@ -359,11 +375,15 @@ class TestDeleteRule:
 
 
 class TestManifest:
-    """Tests for manifest get/save operations including default values, version updates, and consistency with list_rules."""
+    """Tests for manifest get/save operations.
+
+    Covers default values, version updates, and consistency with
+    ``list_rules``.
+    """
 
     @pytest.mark.asyncio
     async def test_get_manifest_empty_db(self, repo):
-        """Verify that an empty DB returns a default manifest with version 1 and no rules."""
+        """Verify empty DB returns default manifest (version 1, no rules)."""
         manifest = await repo.get_manifest()
         assert manifest["version"] == 1
         assert manifest["last_deployed"] is None
