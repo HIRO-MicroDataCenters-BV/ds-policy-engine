@@ -2,6 +2,24 @@ apiVersion: v1
 entries:
   ds-policy-engine:
   - apiVersion: v2
+    appVersion: 0.1.0-dev.29.develop.1d9e3194
+    created: "2026-05-01T06:55:33.573395966Z"
+    description: Standalone policy-as-code microservice (FastAPI + OPA)
+    digest: 0d281d42053375b46a42492e3b79ee8dbe2d09eb0dc5e4f6075db33a81e3bf33
+    keywords:
+    - policy
+    - opa
+    - authorization
+    - rbac
+    - fastapi
+    maintainers:
+    - name: HIRO-MicroDataCenters
+    name: ds-policy-engine
+    type: application
+    urls:
+    - https://HIRO-MicroDataCenters-BV.github.io/ds-policy-engine/helm-charts/ds-policy-engine-0.1.0-dev.29.develop.1d9e3194.tgz
+    version: 0.1.0-dev.29.develop.1d9e3194
+  - apiVersion: v2
     appVersion: 0.1.0-dev.28.develop.5e287098
     created: "2026-05-01T06:55:19.287888601Z"
     description: Standalone policy-as-code microservice (FastAPI + OPA)
@@ -343,4 +361,4 @@ entries:
     urls:
     - https://HIRO-MicroDataCenters-BV.github.io/ds-policy-engine/helm-charts/ds-policy-engine-0.1.0-dev.11.develop.71b34b7e.tgz
     version: 0.1.0-dev.11.develop.71b34b7e
-generated: "2026-05-01T06:55:19.287201005Z"
+generated: "2026-05-01T06:55:33.572724384Z"
