@@ -7,6 +7,14 @@ metadata:
     {{- include "ds-policy-engine.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # 'Recreate' (terminate old before starting new) is required because the
+  # PVC backing the SQLite DB is ReadWriteOnce — only one pod can attach
+  # at a time. The default RollingUpdate strategy creates the new pod
+  # before terminating the old one, which deadlocks on the PVC handover.
+  # Trade-off: ~10s downtime per upgrade, which is acceptable for a
+  # policy-decision service that callers should fail-closed on anyway.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "ds-policy-engine.selectorLabels" . | nindent 6 }}
