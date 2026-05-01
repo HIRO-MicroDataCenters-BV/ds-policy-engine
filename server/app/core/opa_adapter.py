@@ -9,7 +9,7 @@ import logging
 
 import httpx
 
-from app.config import Settings
+from app.settings import Settings
 from app.core.exceptions import PolicyEngineUnreachableError, PolicyEvaluationError
 
 logger = logging.getLogger("policy_engine.opa_adapter")

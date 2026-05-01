@@ -13,7 +13,7 @@ from sqlalchemy import select
 
 from app.core.repository.db_models import MetadataRow, RuleRow
 from app.core.repository.sqlite_rule_repository import SqliteRuleRepository
-from app.db.seed import seed_from_json
+from app.migrate_db import seed_from_json
 
 
 class TestSeedFromJson:

@@ -9,7 +9,7 @@ Tag: OPA Management
 
 from fastapi import APIRouter, Depends
 
-from app.adapters.opa_adapter import OpaAdapter
+from app.core.opa_adapter import OpaAdapter
 from app.rest_api.depends import get_policy_engine
 from app.rest_api.response import success_response
 

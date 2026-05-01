@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
-from app.config import settings
+from app.settings import settings
 
 
 class ErrorItem(BaseModel):

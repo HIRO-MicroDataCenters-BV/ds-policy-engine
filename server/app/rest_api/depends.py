@@ -9,8 +9,8 @@ THIS IS THE SINGLE PLACE to swap implementations:
 
 from functools import lru_cache
 
-from app.adapters.opa_adapter import OpaAdapter
-from app.config import settings
+from app.core.opa_adapter import OpaAdapter
+from app.settings import settings
 from app.core.rego_generator import PermissionBasedRegoStrategy, RegoGenerationStrategy
 from app.core.repository.sqlite_rule_repository import SqliteRuleRepository
 from app.core.usecases import (
@@ -43,7 +43,7 @@ def get_rule_repository() -> SqliteRuleRepository:
         SqliteRuleRepository: Repository instance backed by the current
         async session factory.
     """
-    from app.db import get_session_factory
+    from app.database import get_session_factory
 
     return SqliteRuleRepository(get_session_factory())
 

@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.config import settings
+from app.settings import settings
 from app.core.repository.db_models import MetadataRow, RuleRow
 
 logger = logging.getLogger("policy_engine.seed")

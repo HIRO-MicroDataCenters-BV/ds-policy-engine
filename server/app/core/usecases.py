@@ -16,7 +16,7 @@ import math
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 
-from app.adapters.policy_engine import PolicyEngine
+from app.core.policy_engine import PolicyEngine
 from app.core.entities import (
     PaginationMeta,
     PaginationParams,

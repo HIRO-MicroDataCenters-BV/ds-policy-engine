@@ -73,3 +73,17 @@ async def close_db() -> None:
     if engine:
         await engine.dispose()
         logger.info("Database connection closed")
+
+
+def get_session_factory() -> async_sessionmaker[AsyncSession] | None:
+    """Return the current async session factory initialised by ``init_db``.
+
+    This must be called after ``init_db()`` has completed; otherwise the
+    returned factory will be ``None``.
+
+    Returns:
+        async_sessionmaker | None: The SQLAlchemy ``async_sessionmaker``
+        bound to the application database engine, or ``None`` if
+        ``init_db`` has not yet been called.
+    """
+    return async_session_factory

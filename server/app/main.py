@@ -16,9 +16,9 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.config import settings
+from app.settings import settings
 from app.core.exceptions import PolicyEngineError
-from app.db import close_db, init_db
+from app.database import close_db, init_db
 from app.rest_api.response import error_response
 from app.rest_api.routes import (
     db_viewer,
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     session_factory = await init_db(settings.database_url)
 
     # Seed from JSON if database is empty (first run)
-    from app.db.seed import seed_from_json
+    from app.migrate_db import seed_from_json
 
     seed_path = pathlib.Path(settings.policies_dir) / "seed_rules.json"
     seeded = await seed_from_json(session_factory, str(seed_path))

@@ -16,9 +16,9 @@ from pydantic import BaseModel
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
+from app.settings import settings
 from app.core.repository.db_models import DeployHistoryRow, MetadataRow, RuleRow
-from app.db import get_session_factory
+from app.database import get_session_factory
 from app.rest_api.response import error_response, success_response
 
 logger = logging.getLogger("policy_engine.routes.db")
@@ -80,7 +80,7 @@ async def db_stats():
         )
         roles_count = roles_result.scalar() or 0
 
-    from app.config import settings
+    from app.settings import settings
 
     db_type = "SQLite" if "sqlite" in settings.database_url else "PostgreSQL"
 
