@@ -35,11 +35,13 @@ Run tests / lint locally (Python 3.12 + Poetry required):
 cd server
 poetry install --with dev,test
 poetry run pytest
-poetry run mypy .
-poetry run flake8 .
-poetry run black . --check
-poetry run isort . --check
+poetry run mypy app
+poetry run isort app --check --diff
+poetry run flake8 app --config .flake8 --statistics
+poetry run black app --check --diff
 ```
+
+For deeper layout / dev docs, see [server/README.md](server/README.md) and [CLAUDE.md](CLAUDE.md).
 
 ## Artifacts (published by CI)
 
@@ -60,13 +62,13 @@ HIRO uses [GitFlow with Forks](https://hirodevops.notion.site/GitFlow-with-Forks
 
 Per-site values live in `HIRO-MicroDataCenters-BV/ds-gitops` under `{ki,hus,uva}-services/policy-engine/`. Fleet pulls the chart from gh-pages.
 
-Deployed subdomains per site:
+Deployed subdomains per site (TLS terminated by the cluster edge controller; chart Ingress itself is HTTP — see `server/charts/ds-policy-engine/templates/ingress.yaml`):
 
 | Site | URL |
 |------|-----|
-| ki  | `http://ds-policy-engine.ki.nextgen.hiro-develop.nl` |
-| hus | `http://ds-policy-engine.hus.nextgen.hiro-develop.nl` |
-| uva | `http://ds-policy-engine.uva.nextgen.hiro-develop.nl` |
+| ki  | `https://ds-policy-engine.ki.nextgen.hiro-develop.nl` |
+| hus | `https://ds-policy-engine.hus.nextgen.hiro-develop.nl` |
+| uva | `https://ds-policy-engine.uva.nextgen.hiro-develop.nl` |
 
 ## License
 
