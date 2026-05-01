@@ -11,9 +11,9 @@ Tag: Health
 from fastapi import APIRouter, Depends
 
 from app.core.opa_adapter import OpaAdapter
-from app.settings import settings
 from app.rest_api.depends import get_policy_engine
 from app.rest_api.response import success_response
+from app.settings import settings
 
 router = APIRouter(tags=["Health"])
 

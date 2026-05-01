@@ -10,7 +10,6 @@ THIS IS THE SINGLE PLACE to swap implementations:
 from functools import lru_cache
 
 from app.core.opa_adapter import OpaAdapter
-from app.settings import settings
 from app.core.rego_generator import PermissionBasedRegoStrategy, RegoGenerationStrategy
 from app.core.repository.sqlite_rule_repository import SqliteRuleRepository
 from app.core.usecases import (
@@ -19,6 +18,7 @@ from app.core.usecases import (
     PolicyEvaluationUsecase,
     RuleManagementUsecase,
 )
+from app.settings import settings
 
 # --- Adapter layer ---
 

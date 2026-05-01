@@ -16,7 +16,6 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.settings import settings
 from app.core.exceptions import PolicyEngineError
 from app.database import close_db, init_db
 from app.rest_api.response import error_response
@@ -29,6 +28,7 @@ from app.rest_api.routes import (
     policy,
     rules,
 )
+from app.settings import settings
 
 # ---------------------------------------------------------------------------
 # Logging

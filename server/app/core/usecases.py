@@ -16,7 +16,6 @@ import math
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 
-from app.core.policy_engine import PolicyEngine
 from app.core.entities import (
     PaginationMeta,
     PaginationParams,
@@ -29,6 +28,7 @@ from app.core.exceptions import (
     RuleConflictError,
     RuleNotFoundError,
 )
+from app.core.policy_engine import PolicyEngine
 from app.core.rego_generator import RegoGenerationStrategy
 from app.core.repository.repositories import RuleRepository
 from app.core.validators import validate_permissions, validate_role

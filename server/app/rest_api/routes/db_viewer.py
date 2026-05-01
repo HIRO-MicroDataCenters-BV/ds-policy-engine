@@ -16,10 +16,10 @@ from pydantic import BaseModel
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.settings import settings
 from app.core.repository.db_models import DeployHistoryRow, MetadataRow, RuleRow
 from app.database import get_session_factory
 from app.rest_api.response import error_response, success_response
+from app.settings import settings
 
 logger = logging.getLogger("policy_engine.routes.db")
 
