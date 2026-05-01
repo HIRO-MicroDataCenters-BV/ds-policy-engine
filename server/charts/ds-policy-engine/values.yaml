@@ -45,11 +45,19 @@ ingress:
   # Default off — opt-in per site via gitops values. Prevents an unintended
   # Ingress on the default host when someone installs the chart raw.
   enabled: false
-  className: ""
-  annotations: {}
+  className: nginx
+  # cert-manager provisions a per-host cert when this annotation is present
+  # and tls.secretName is set. Same pattern used by ds-search, ds-catalog, etc.
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
   host: ds-policy-engine.nextgen.hiro-develop.nl
   path: /
   pathType: Prefix
+  tls:
+    enabled: true
+    # cert-manager will create / refresh this Secret in the install namespace.
+    # Same name across ki/hus/uva — namespaced, so no collision.
+    secretName: ds-policy-engine-tls-secret
 
 persistence:
   enabled: true
