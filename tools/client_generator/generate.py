@@ -48,6 +48,12 @@ def generate_openapi(
         "/project",
         "-i",
         file,
+        # Skip per-API and per-model test stubs — they're never useful for a
+        # generated SDK (the test bodies are TODO scaffolding) and they produce
+        # different file lists between Linux / Windows-Docker environments,
+        # which breaks the "Verify client has been updated" diff check in CI.
+        "--global-property",
+        "apiTests=false,modelTests=false",
     ]
 
     if volumes is not None:
