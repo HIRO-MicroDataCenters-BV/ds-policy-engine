@@ -31,18 +31,24 @@ jobs:
 
       - name: Start OPA
         run: |
-          # --network host shares the runner's network namespace, so OPA
-          # listens on the runner's loopback directly. No port mapping
-          # needed; pytest reaches it via http://127.0.0.1:8181.
+          # --network host shares the runner's network namespace; bind
+          # OPA on 0.0.0.0:8181 so the host's 127.0.0.1:8181 reaches it.
           docker run -d --name opa --network host openpolicyagent/opa:latest \
-            run --server --addr 127.0.0.1:8181 --log-level warn
+            run --server --addr 0.0.0.0:8181 --log-level info
           # Wait for readiness (/health returns 200 when OPA is up).
+          ready=false
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:8181/health >/dev/null 2>&1; then
-              echo "OPA ready"; break
+              echo "OPA ready"; ready=true; break
             fi
             sleep 1
           done
+          if [ "$ready" != "true" ]; then
+            echo "OPA NOT ready — diagnostic dump follows"
+            docker ps -a --filter name=opa
+            docker logs opa || true
+            exit 1
+          fi
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
