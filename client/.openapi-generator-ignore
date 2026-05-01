@@ -17,3 +17,8 @@ setup.py
 test-requirements.txt
 LICENSE
 generator
+
+# Hand-written smoke test — kept so pytest collects at least one item even
+# though we disable openapi-generator's per-model/api test stubs (see
+# tools/client_generator/generate.py --global-property apiTests=false,modelTests=false).
+test/test_smoke.py
