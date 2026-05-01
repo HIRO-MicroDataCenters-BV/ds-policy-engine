@@ -101,12 +101,20 @@ _docs_kwargs = (
 )
 
 app = FastAPI(
-    title="Policy Engine",
+    title="Data Space Policy Engine Service",
     description=(
         "Standalone policy-as-code microservice. "
         "Evaluates user permissions based on role and institute using OPA."
     ),
     version=settings.app_version,
+    contact={
+        "name": "HIRO-MicroDataCenters",
+        "email": "all-hiro@hiro-microdatacenters.nl",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://github.com/HIRO-MicroDataCenters-BV/ds-policy-engine/blob/main/LICENSE",
+    },
     lifespan=lifespan,
     **_docs_kwargs,
 )

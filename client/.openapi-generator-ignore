@@ -1,8 +1,19 @@
-# OpenAPI Generator Ignore
-# Generated files managed by hand are listed here.
-# Reference: https://openapi-generator.tech/docs/customization#ignore-file-format
+# Files the generator should never produce or overwrite.
+# Format documented at: https://openapi-generator.tech/docs/customization#ignore-file-format
+#
+# pyproject.toml, README.md, setup.cfg, tox.ini are NOT listed here:
+# they ARE generated, but from the custom mustache templates under
+# tools/client_generator/templates/ (so they end up matching the
+# package + repo conventions).
 
-README.md
-pyproject.toml
-setup.cfg
-tox.ini
+.github/**
+.openapi-generator-ignore
+.gitlab-ci.yml
+.travis.yml
+.gitignore
+git_push.sh
+requirements.txt
+setup.py
+test-requirements.txt
+LICENSE
+generator
