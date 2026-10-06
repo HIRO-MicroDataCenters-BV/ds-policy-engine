@@ -1,0 +1,50 @@
+# ds-policy-engine — Helm values for the cog-engine dev cluster.
+#
+# Target: the "cognitive-engine" cluster (RKE2 + Calico, Juju/Rancher-managed).
+# Unlike the nextgen sites (ki/hus/uva) — deployed from the ds-gitops repo via
+# Fleet — the cog cluster has NO GitOps values repo, so this per-cluster values
+# file lives here in-repo and is applied with a direct `helm install` from the
+# chart under server/charts/ds-policy-engine (see README.md).
+#
+# In-cluster only: Cog-Engine reaches it over ClusterIP DNS
+#   http://ds-policy-engine.policy-engine.svc.cluster.local:8000
+# It is never exposed publicly (ingress disabled), which cuts the previous
+# cross-cluster/public-internet hop to the nextgen instance.
+
+ingress:
+  enabled: false                 # no public URL
+
+opa:
+  enabled: true                  # OPA sidecar at 127.0.0.1:8181
+
+persistence:
+  enabled: true                  # SQLite rules DB on a PVC
+  size: 1Gi
+
+database:
+  url: sqlite+aiosqlite:////app/data/policy_engine.db
+  # For HA / shared state, point at the cluster Postgres instead, e.g.:
+  # url: postgresql+asyncpg://<user>:<pass>@postgresql.kubeflow.svc.cluster.local:5432/policy_engine
+
+env:
+  logLevel: INFO
+  nodeName: "cogapi"             # seeded/default rules get institute=cogapi, matching what Cog-Engine sends
+
+cors:
+  allowedOrigins: ""             # set to the UI origin only if ds-policy-engine-ui is hosted in-cluster
+
+image:
+  # Public on GHCR — no imagePullSecret needed. Bump to a newer main build as needed.
+  repository: "ghcr.io/hiro-microdatacenters-bv/ds-policy-engine"
+  tag: "0.1.0-dev.35.main.3a11d6c1"
+
+imagePullSecrets: []
+
+# Serve under the /policy-engine sub-path so Swagger + openapi.json resolve when
+# exposed at https://dashboard.cog.hiro-develop.nl/policy-engine/ through the
+# Istio VirtualService (virtualservice.yaml). The VirtualService strips the
+# /policy-engine prefix; --root-path tells FastAPI its external base path so the
+# generated docs/openapi URLs are prefixed correctly.
+container:
+  command: ["uvicorn"]
+  args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/policy-engine"]

@@ -1,0 +1,31 @@
+# Exposes the policy engine API at https://dashboard.cog.hiro-develop.nl/policy-engine/
+# through the shared Istio kubeflow-gateway — the same mechanism that serves
+# /apidev (the cog-api-dev VirtualService). The chart's nginx Ingress stays off;
+# this cluster routes via Istio.
+#
+# The /policy-engine prefix is STRIPPED here (rewrite -> /), because ds-policy-engine
+# serves at / and /api/v1; the app is told its external base path via
+# `uvicorn --root-path /policy-engine` (see values.yaml) so Swagger/openapi links
+# resolve. Reached from the browser it is Dex-auth-gated by oidc-authservice;
+# cog-api still calls the service internally over ClusterIP, unaffected.
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ds-policy-engine
+  namespace: kubeflow
+spec:
+  gateways:
+    - kubeflow/kubeflow-gateway
+  hosts:
+    - '*'
+  http:
+    - match:
+        - uri:
+            prefix: /policy-engine/
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: ds-policy-engine.policy-engine.svc.cluster.local
+            port:
+              number: 8000
