@@ -20,6 +20,12 @@ asyncpg = "^0.29.0"
 alembic = "^1.14.0"
 pyyaml = "^6.0"
 prometheus-fastapi-instrumentator = "^7.0.0"
+# Optional — only used when DS__AUTH__ENABLED=true. Default off keeps this
+# service backward compatible with the Phase-0 unauthenticated flow.
+ds-auth = { git = "https://github.com/HIRO-MicroDataCenters-BV/ds-auth.git", rev = "develop", optional = true }
+
+[tool.poetry.extras]
+auth = ["ds-auth"]
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8"
