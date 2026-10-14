@@ -140,9 +140,7 @@ if settings.auth_enabled:
     # missing error, and the test suite can exercise this path without the
     # auth extra installed.
     if not settings.auth_jwks_url:
-        raise RuntimeError(
-            "DS__AUTH_ENABLED=true requires DS__AUTH_JWKS_URL to be set"
-        )
+        raise RuntimeError("DS__AUTH_ENABLED=true requires DS__AUTH_JWKS_URL to be set")
 
     try:
         from ds_auth import DataspaceAuthMiddleware  # type: ignore[import-not-found]
