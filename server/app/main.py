@@ -135,39 +135,43 @@ if _cors_origins:
 # env vars. Matches zero-trust / defense-in-depth guidance — the service
 # enforces its own policy regardless of what the edge (APISIX gateway) did.
 if settings.auth_enabled:
+    # Validate required config BEFORE importing the optional ds-auth package —
+    # that way a misconfiguration surfaces the config error, not a package-
+    # missing error, and the test suite can exercise this path without the
+    # auth extra installed.
+    if not settings.auth_jwks_url:
+        raise RuntimeError(
+            "DS__AUTH_ENABLED=true requires DS__AUTH_JWKS_URL to be set"
+        )
+
     try:
         from ds_auth import DataspaceAuthMiddleware  # type: ignore[import-not-found]
-
-        from app.rest_api.auth_config import PERMISSION_MAP, PUBLIC_PATHS
-
-        if not settings.auth_jwks_url:
-            raise RuntimeError(
-                "DS__AUTH_ENABLED=true requires DS__AUTH_JWKS_URL to be set"
-            )
-
-        # self-reference; /evaluate is on PUBLIC_PATHS so this doesn't loop
-        _policy_url = settings.auth_policy_engine_url or "http://localhost:8000"
-
-        app.add_middleware(
-            DataspaceAuthMiddleware,
-            jwks_url=settings.auth_jwks_url,
-            issuer=settings.auth_jwt_issuer,
-            audience=settings.auth_jwt_audience,
-            policy_engine_url=_policy_url,
-            permission_map=PERMISSION_MAP,
-            public_paths=list(PUBLIC_PATHS),
-        )
-        logger.info(
-            "ds-auth middleware enabled: jwks=%s issuer=%s policy_engine=%s",
-            settings.auth_jwks_url,
-            settings.auth_jwt_issuer,
-            _policy_url,
-        )
     except ImportError as e:
         raise RuntimeError(
             "DS__AUTH_ENABLED=true but ds-auth is not installed. "
             "Install with: poetry install --extras auth"
         ) from e
+
+    from app.rest_api.auth_config import PERMISSION_MAP, PUBLIC_PATHS
+
+    # self-reference; /evaluate is on PUBLIC_PATHS so this doesn't loop
+    _policy_url = settings.auth_policy_engine_url or "http://localhost:8000"
+
+    app.add_middleware(
+        DataspaceAuthMiddleware,
+        jwks_url=settings.auth_jwks_url,
+        issuer=settings.auth_jwt_issuer,
+        audience=settings.auth_jwt_audience,
+        policy_engine_url=_policy_url,
+        permission_map=PERMISSION_MAP,
+        public_paths=list(PUBLIC_PATHS),
+    )
+    logger.info(
+        "ds-auth middleware enabled: jwks=%s issuer=%s policy_engine=%s",
+        settings.auth_jwks_url,
+        settings.auth_jwt_issuer,
+        _policy_url,
+    )
 
 
 # ---------------------------------------------------------------------------

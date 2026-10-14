@@ -104,7 +104,17 @@ def test_auth_enabled_without_jwks_url_fails(monkeypatch):
 
 
 def test_auth_enabled_installs_middleware(monkeypatch):
-    """With DS__AUTH_ENABLED=true + a JWKS URL, the middleware is wired."""
+    """With DS__AUTH_ENABLED=true + a JWKS URL, the middleware is wired.
+
+    Only runs when the optional ``ds-auth`` extra is installed
+    (``poetry install --extras auth``); CI's default job installs base
+    dependencies only, so this test is skipped there.
+    """
+    pytest.importorskip(
+        "ds_auth",
+        reason="ds-auth optional extra not installed "
+        "(install with: poetry install --extras auth)",
+    )
     monkeypatch.setenv("DS__AUTH_ENABLED", "true")
     monkeypatch.setenv("DS__AUTH_JWKS_URL", "http://login.test/.well-known/jwks.json")
     main_mod = _reload_app()
