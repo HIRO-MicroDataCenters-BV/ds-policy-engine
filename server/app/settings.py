@@ -42,6 +42,27 @@ class Settings(BaseSettings):
     # exposed to unauthenticated callers. Enable only in dev/debug.
     db_query_enabled: bool = False
 
+    # --- Authentication (ds-auth integration) ---
+    # When disabled (default), every endpoint is open — matches Phase-0.
+    # When enabled, every endpoint EXCEPT the public set (health, openapi,
+    # and /api/v1/policies/evaluate) requires a JWT whose claims pass the
+    # policy engine's own `rules:admin` permission check.
+    #
+    # Enable in deployments where ds-login (JWT issuer) exists and partner
+    # nodes expect their policy admin UI to be gated. Set:
+    #   DS__AUTH_ENABLED=true
+    #   DS__AUTH_JWKS_URL=http://ds-login:8080/.well-known/jwks.json
+    #   DS__AUTH_POLICY_ENGINE_URL=http://localhost:8000   # self-reference ok
+    auth_enabled: bool = False
+    auth_jwks_url: str = ""
+    auth_jwt_issuer: str = "ds-login"
+    auth_jwt_audience: str = "hiro-services"
+    # URL the auth middleware calls for its /api/v1/policies/evaluate decision.
+    # Empty value is resolved to this process's own base URL at startup (self
+    # reference — /evaluate is on the public path list so the self-call does
+    # not loop through auth again).
+    auth_policy_engine_url: str = ""
+
     model_config = SettingsConfigDict(
         env_prefix="DS__",
         env_file=".env",
