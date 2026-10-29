@@ -1,0 +1,50 @@
+{{- if .Values.rules }}
+# Policy rules from the chart values (e.g. gitops), loaded into the engine by
+# the rules-loader Job after every install and upgrade. The values are the
+# source of truth: the loader REPLACES all rules in the engine with these.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ds-policy-engine.fullname" . }}-rules
+  namespace: {{ include "ds-policy-engine.namespace" . }}
+  labels:
+    {{- include "ds-policy-engine.labels" . | nindent 4 }}
+data:
+  rules.json: {{ dict "mode" "replace" "rules" .Values.rules | toJson | quote }}
+  load_rules.py: |
+    """Replace the engine's rules with rules.json, then deploy them to OPA."""
+    import json, sys, time, urllib.error, urllib.request
+
+    BASE = sys.argv[1].rstrip("/")
+    body = json.load(open("/rules/rules.json"))
+
+    def call(method, path, payload=None, timeout=20):
+        req = urllib.request.Request(
+            BASE + path, method=method,
+            data=json.dumps(payload).encode() if payload is not None else None,
+            headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read() or b"null")
+
+    # The engine may still be (re)starting: upgrades recreate its pod.
+    deadline = time.time() + {{ .Values.rulesLoader.waitSeconds | int }}
+    while True:
+        try:
+            call("GET", "/health", timeout=5)
+            break
+        except (urllib.error.URLError, OSError) as e:
+            if time.time() > deadline:
+                sys.exit(f"policy engine not reachable at {BASE}: {e}")
+            time.sleep(3)
+
+    res = call("POST", "/api/v1/rules/import/json", body)
+    data = (res or {}).get("data") or {}
+    errors = data.get("errors") or []
+    print(f"imported {data.get('imported')} of {len(body['rules'])} rules (mode=replace)")
+    if errors or data.get("imported") != len(body["rules"]):
+        sys.exit(f"rule import incomplete: {errors or data}")
+    call("POST", "/api/v1/policies/deploy", {})
+    for rule in body["rules"]:
+        print(f"  {rule['role']}@{rule.get('institute', '')}: {', '.join(rule.get('permissions', []))}")
+    print("rules deployed to OPA")
+{{- end }}
