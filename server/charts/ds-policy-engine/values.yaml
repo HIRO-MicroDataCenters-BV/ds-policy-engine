@@ -119,6 +119,22 @@ resources:
     cpu: "500m"
 
 namespace: ""
+# Policy rules, role@institute → permissions. When set, a Job loads them
+# after every install/upgrade and REPLACES all rules in the engine (rules
+# made by hand in the UI are overwritten on the next deploy). Empty = the
+# engine keeps whatever it has (first start: its built-in seed rules).
+# Institute = the site name (hus, ki, uva; hiro on local kind).
+#   rules:
+#     - name: site-admin-hus
+#       role: site_admin
+#       institute: hus
+#       permissions: [issuer:write, issuer:read, rules:admin, catalog:read, catalog:write]
+rules: []
+rulesLoader:
+  # How long the Job waits for the engine to answer (it restarts on upgrades).
+  waitSeconds: 300
+  backoffLimit: 3
+
 nodeSelector: {}
 tolerations: []
 affinity: {}

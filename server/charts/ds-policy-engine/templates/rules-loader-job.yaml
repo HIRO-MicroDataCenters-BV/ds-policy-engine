@@ -1,0 +1,56 @@
+{{- if .Values.rules }}
+# Loads .Values.rules into the engine after every install and upgrade
+# (Helm hook), so a site gets its rules without manual steps and a change in
+# the values replaces the rules. Uses the service image (it has Python).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ds-policy-engine.fullname" . }}-rules-loader
+  namespace: {{ include "ds-policy-engine.namespace" . }}
+  labels:
+    {{- include "ds-policy-engine.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: {{ .Values.rulesLoader.backoffLimit }}
+  activeDeadlineSeconds: {{ add .Values.rulesLoader.waitSeconds 120 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ds-policy-engine.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: rules-loader
+      annotations:
+        # New rules → new pod spec, so the Job really reruns.
+        checksum/rules: {{ toJson .Values.rules | sha256sum }}
+    spec:
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: rules-loader
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "/rules/load_rules.py"]
+          args:
+            - "http://{{ include "ds-policy-engine.fullname" . }}:{{ .Values.service.port }}"
+          volumeMounts:
+            - name: rules
+              mountPath: /rules
+              readOnly: true
+      volumes:
+        - name: rules
+          configMap:
+            name: {{ include "ds-policy-engine.fullname" . }}-rules
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
